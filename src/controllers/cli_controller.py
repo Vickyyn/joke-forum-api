@@ -4,6 +4,7 @@ from models.user import User
 from models.joke import Joke
 from models.upvote import Upvote
 from init import bcrypt
+from datetime import date
 
 db_commands = Blueprint('db', __name__)
 
@@ -42,9 +43,33 @@ def seed_db():
     db.session.add_all(users)
     db.session.commit()
 
-    # jokes = [
-    #     Joke(
-    #         title = 'A man walked into a bar'
+    jokes = [
+        Joke(
+            title = 'A man walked into a bar',
+            body = 'and said ouch',
+            date = date.today(),
+            owner = 2
+        ),
+        Joke(
+            title = 'What do you call a deer with no eyes?',
+            body = 'no idea',
+            date = date.today(),
+            owner = 3
+        ),
+        Joke(
+            title = 'Why was 6 afraid of 7?',
+            body = 'because 7 8 9',
+            date = date.today(),
+            owner = 3
+        ),
+        Joke(
+            title = "What is a sheep's favourite newspaper?",
+            body = 'The Wool Street Journal',
+            date = date.today(),
+            owner = 4
+        )
+    ]
 
-    #     )
-    # ]
+    db.session.add_all(jokes)
+    db.session.commit()
+

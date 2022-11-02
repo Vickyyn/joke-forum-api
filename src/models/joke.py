@@ -3,7 +3,7 @@ from init import db, ma
 class Joke(db.Model):
     __tablename__ = 'jokes'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=False)
+    title = db.Column(db.String(150), nullable=False)
     body = db.Column(db.Text, nullable=False)
     date = db.Column(db.Date)
     owner = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))
