@@ -1,5 +1,6 @@
 from init import db, ma
-from marshmallow import fields
+from marshmallow import fields, validate
+from marshmallow.validate import Length
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -13,10 +14,10 @@ class User(db.Model):
 
 class UserSchema(ma.Schema):
     jokes = fields.List(fields.Nested('JokeSchema', exclude=['user', 'owner']))
+    username = fields.String(required=True, validate=Length(min=4, max=20, error='username must be between 4 - 20 characters long'))
+    password = fields.String(required=True, validate=Length(min=4, error='password must be at least 4 characters long'))
+
 
     class Meta:
         fields = ('id', 'username', 'password', 'jokes')
         ordered = True
-
-# username need minimum length 4
-# password minimum length 4

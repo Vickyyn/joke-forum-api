@@ -1,4 +1,7 @@
 from init import db, ma
+from marshmallow import fields, validate
+from marshmallow.validate import Length
+
 
 class Tag(db.Model):
     __tablename__ = 'tags'
@@ -8,8 +11,10 @@ class Tag(db.Model):
 
 
 class TagSchema(ma.Schema):
+    name = fields.String(required=True, validate=Length(max=45, error='tags can only be up to 45 characters long'))
+
     class Meta:
         fields = ('id', 'name', 'description')
         ordered = True
 
-# Limit 50 as longest english word is 45 letters 
+# Limit 45 as longest english word is 45 letters 
