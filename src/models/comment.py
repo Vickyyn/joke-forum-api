@@ -5,7 +5,8 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     joke_id = db.Column(db.Integer, db.ForeignKey('jokes.id', ondelete='CASCADE'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
-    date = db.Column(db.Date)
+    # Date of creation
+    date = db.Column(db.Date) 
     body = db.Column(db.Text, nullable=False)
 
 

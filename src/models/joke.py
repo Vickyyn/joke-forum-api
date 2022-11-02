@@ -7,7 +7,8 @@ class Joke(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     body = db.Column(db.Text, nullable=False)
-    date = db.Column(db.Date)
+    # Date of creation
+    date = db.Column(db.Date) 
     owner = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))
 
     # Display the username as well as the owner(user_id)
