@@ -1,4 +1,5 @@
 from init import db, ma
+from marshmallow import fields
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -7,10 +8,14 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
 
+    jokes = db.relationship('Joke', back_populates='user', cascade=False)
+
 
 class UserSchema(ma.Schema):
+    jokes = fields.List(fields.Nested('JokeSchema', exclude=['user', 'owner']))
+
     class Meta:
-        fields = ('id', 'username', 'password')
+        fields = ('id', 'username', 'password', 'jokes')
         ordered = True
 
 # username need minimum length 4

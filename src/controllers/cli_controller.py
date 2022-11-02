@@ -67,7 +67,7 @@ def seed_db():
             owner = 3
         ),
         Joke(
-            title = "What is a sheep\'s favourite newspaper?",
+            title = "What is a sheep's favourite newspaper?",
             body = 'The Wool Street Journal',
             date = date.today(),
             owner = 4

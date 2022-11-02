@@ -1,4 +1,5 @@
 from init import db, ma
+from marshmallow import fields
 
 class Joke(db.Model):
     __tablename__ = 'jokes'
@@ -8,8 +9,15 @@ class Joke(db.Model):
     date = db.Column(db.Date)
     owner = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))
 
+    # Display the username as well as the owner(user_id)
+    user = db.relationship('User', back_populates='jokes')
 
 class JokeSchema(ma.Schema):
+    user = fields.Nested('UserSchema', only=['username'])
+
     class Meta:
-        fields = ('id', 'title', 'body', 'date', 'owner')
+        fields = ('id', 'title', 'body', 'date', 'owner', 'user')
         ordered = True
+
+
+# list owner name rather than owner id

@@ -2,6 +2,9 @@ from flask import Flask
 import os
 from init import db, ma, bcrypt
 from controllers.cli_controller import db_commands
+from controllers.jokes_controller import jokes_bp
+from controllers.users_controller import users_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -14,9 +17,11 @@ def create_app():
     bcrypt.init_app(app)
 
     app.register_blueprint(db_commands)
+    app.register_blueprint(jokes_bp)
+    app.register_blueprint(users_bp)
 
     @app.route('/')
     def hello():
-        return 'Hello World!'
+        return 'Welcome to the jokes forum!'
 
     return app
