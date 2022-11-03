@@ -24,8 +24,9 @@ class JokeSchema(ma.Schema):
     # Repeated maximum length for better Error display message handling
     title = fields.String(required=True, validate=Length(max=150, error='titles can only be up to 150 characters'))
     joke_tags = fields.List(fields.Nested(('Joke_tagSchema'), only=['tag_id']))
-    # upvotes = fields.Function(lambda id: db.session.query(Upvote).filter(Upvote.joke_id == id).count())
-    # upvotes = fields.Function(lambda id: db.session.query(Upvote).filter_by(joke_id=id).count())
+    # upvotes = fields.Function(lambda id: db.session.query(Upvote).filter(Upvote.joke_id==id).count())
+    # upvotes = fields.Function(lambda id: db.session.query(Upvote).filter_by(joke_id == id).count())
+    # upvotes = fields.Function(lambda id: db.select(Upvote).filter_by(joke_id=id).count())
 
 
     class Meta:
