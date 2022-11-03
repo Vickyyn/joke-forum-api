@@ -6,8 +6,6 @@ class Upvote(db.Model):
     joke_id = db.Column(db.Integer, db.ForeignKey('jokes.id', ondelete='CASCADE'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
 
-    # joke = db.relationship('Joke', back_populates='upvotes')
-
 
 class UpvoteSchema(ma.Schema):
     class Meta:
