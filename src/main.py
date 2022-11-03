@@ -5,6 +5,7 @@ from controllers.cli_controller import db_commands
 from controllers.jokes_controller import jokes_bp
 from controllers.users_controller import users_bp
 from controllers.joke_ids_controller import joke_ids_bp
+from controllers.auth_controller import auth_bp
 from marshmallow.exceptions import ValidationError
 
 def create_app():
@@ -22,6 +23,7 @@ def create_app():
     #Jokes_bp as parent blueprint and joke_ids_bp as child blueprint (nested)
     jokes_bp.register_blueprint(joke_ids_bp)
     app.register_blueprint(jokes_bp)
+    app.register_blueprint(auth_bp)
     
 
     @app.errorhandler(ValidationError)
