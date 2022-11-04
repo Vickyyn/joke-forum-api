@@ -36,7 +36,7 @@ def delete_one_joke(id):
             db.session.commit()
             return {'message': f'Joke {joke.id} has been deleted'}         
         else:
-            raise ValidationError('Jokes can only be deleted by their owner or admin')
+            return {'error': 'Jokes can only be deleted by their owner or admin'}, 403
     else:
         return {'error': f'No joke found with id {id}'}, 404
 
@@ -59,7 +59,7 @@ def update_joke(id):
             db.session.commit()
             return JokeSchema().dump(joke)
         else:
-            raise ValidationError('Jokes can only be edited by their owner')
+            return {'error': 'Jokes can only be edited by their owner'}, 403
     else:
         return {'error': f'No joke found with id {id}'}, 404 
 
@@ -100,6 +100,6 @@ def upvote_joke(id):
             else:
                 return {'message': 'You have not upvoted this joke'}, 405
         else:
-            return {'error': "You must input 'upvote' as 'yes' or 'no'"}, 400
+            raise ValidationError("You must input 'upvote' as 'yes' or 'no'")
         
 

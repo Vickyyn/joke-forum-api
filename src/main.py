@@ -27,11 +27,6 @@ def create_app():
     app.register_blueprint(jokes_bp)
     app.register_blueprint(auth_bp)
     
-
-    @app.errorhandler(ValidationError)
-    def validation_error(err):
-        return {'error': err.messages}, 404
-
     @app.route('/')
     def hello():
         return 'Welcome to the jokes forum!'
@@ -39,5 +34,10 @@ def create_app():
     @app.errorhandler(404)
     def not_found(err):
         return {'error': str(err)}, 404
+
+    @app.errorhandler(ValidationError)
+    def validation_error(err):
+        return {'error': err.messages}, 400
+
 
     return app
