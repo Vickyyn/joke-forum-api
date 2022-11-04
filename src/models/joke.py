@@ -18,7 +18,7 @@ class Joke(db.Model):
     # upvotes = db.relationship('Upvote', back_populates='joke')
     upvotes = db.Column(db.Integer, default=0)
     # Display tags 
-    joke_tags = db.relationship('Joke_tag', back_populates='joke')
+    joke_tags = db.relationship('Joke_tag', back_populates='joke', cascade='all, delete')
 
 class JokeSchema(ma.Schema):
     user = fields.Nested('UserSchema', only=['username'])

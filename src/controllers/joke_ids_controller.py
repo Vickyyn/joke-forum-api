@@ -2,7 +2,9 @@ from flask import Blueprint, request
 from init import db
 from models.joke import Joke, JokeSchema
 from models.upvote import Upvote
+from models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from marshmallow.exceptions import ValidationError
 
 # Nested blueprint from jokes_bp
 joke_ids_bp = Blueprint('joke_ids', __name__, url_prefix='/<int:id>')
@@ -19,28 +21,45 @@ def get_one_joke(id):
 
 # Allow owner or admin to delete a joke
 @joke_ids_bp.route('/', methods=['DELETE'])
+@jwt_required()
 def delete_one_joke(id):
     stmt = db.select(Joke).filter_by(id=id)
     joke = db.session.scalar(stmt)
     if joke:
-        db.session.delete(joke)
-        db.session.commit()
-        return {'message': f'Joke {joke.id} has been deleted'}
+        # Ensure only owner or admin can delete
+        # int to avoid pass by reference
+        user_id = int(get_jwt_identity())
+        stmt = db.select(User).filter_by(id=user_id)
+        user = db.session.scalar(stmt)
+        if joke.owner == user_id or user.is_admin:
+            db.session.delete(joke)
+            db.session.commit()
+            return {'message': f'Joke {joke.id} has been deleted'}         
+        else:
+            raise ValidationError('Jokes can only be deleted by their owner or admin')
     else:
         return {'error': f'No joke found with id {id}'}, 404
 
 # Allow owner to update a joke
 @joke_ids_bp.route('/', methods=['PUT', 'PATCH'])
+@jwt_required()
 def update_joke(id):
+    # Ensure joke exists and retrieve joke
     stmt = db.select(Joke).filter_by(id=id)
     joke = db.session.scalar(stmt)
     if joke:
-        # Ensure valid update (within title character limit)
-        JokeSchema().load(request.json)
-        joke.title = request.json.get('title') or joke.title
-        joke.body = request.json.get('body') or joke.body
-        db.session.commit()
-        return JokeSchema().dump(joke)
+        # Ensure only owner can update
+        # int to avoid pass by reference (will not work otherwise)
+        user_id = int(get_jwt_identity())
+        if joke.owner == user_id:
+            # Ensure valid update (within title character limit)
+            JokeSchema().load(request.json)
+            joke.title = request.json.get('title') or joke.title
+            joke.body = request.json.get('body') or joke.body
+            db.session.commit()
+            return JokeSchema().dump(joke)
+        else:
+            raise ValidationError('Jokes can only be edited by their owner')
     else:
         return {'error': f'No joke found with id {id}'}, 404 
 
