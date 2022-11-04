@@ -52,13 +52,15 @@ def seed_db():
             title = 'A man walked into a bar',
             body = 'and said ouch',
             date = date.today(),
-            owner = 2
+            owner = 2,
+            upvotes = 2
         ),
         Joke(
             title = 'What do you call a deer with no eyes?',
             body = 'no idea',
             date = date.today(),
-            owner = 3
+            owner = 3,
+            upvotes = 2
         ),
         Joke(
             title = 'Why was 6 afraid of 7?',

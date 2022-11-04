@@ -10,8 +10,12 @@ jokes_bp = Blueprint('jokes', __name__, url_prefix='/jokes')
 @jokes_bp.route('/')
 def get_all_jokes():
     # stmt = db.select(Joke).order_by(db.session.query(Joke_tag).filter(Joke_tag.joke_id==Joke.id).count())
-    stmt = db.select(Joke)
+    stmt = db.select(Joke).order_by(Joke.upvotes.desc())
     jokes = db.session.scalars(stmt)
+    # jokes.order_by(
+    #     db.session.query(Joke_tag).filter_by(Joke_tag.joke_id==Joke.id).count()
+    # )
+    # db.session.query(Upvote).filter_by(joke_id=obj.id).count()
     return JokeSchema(many=True).dump(jokes)
 
 # Allow public to view all tags
