@@ -1,4 +1,5 @@
 from init import db, ma
+from marshmallow import validates
 
 class Upvote(db.Model):
     __tablename__ = 'upvotes'
@@ -12,7 +13,7 @@ class Upvote(db.Model):
 class UpvoteSchema(ma.Schema):
     class Meta:
         fields = ('id', 'joke_id', 'user_id')
-        ordered = True
+        ordered = True  
 
 
 # Note this table needs to be unique

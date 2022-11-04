@@ -31,6 +31,10 @@ def create_app():
     def hello():
         return 'Welcome to the jokes forum!'
 
+    @app.errorhandler(400)
+    def not_found(err):
+        return {'error': str(err)}, 400
+
     @app.errorhandler(404)
     def not_found(err):
         return {'error': str(err)}, 404
