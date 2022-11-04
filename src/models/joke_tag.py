@@ -22,4 +22,32 @@ class Joke_tagSchema(ma.Schema):
         ordered = True
 
 
+
+# from joke import Joke
+
+# association_table = Table(
+#     "association_table",
+#     Base.metadata,
+#     Column("left_id", ForeignKey("left_table.id"), primary_key=True),
+#     Column("right_id", ForeignKey("right_table.id"), primary_key=True),
+# )
+
+
+# # class Tag(db.Model):
+# #     __tablename__ = "left_table"
+
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     children: Mapped[list[Child]] = relationship(
+#         secondary=association_table, back_populates="parents"
+#     )
+
+
+# class Joke(Base):
+#     __tablename__ = "right_table"
+
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    # parents: Mapped[list[Parent]] = relationship(
+    #     secondary=association_table, back_populates="children"
+    # )
+
 # Note this table needs to be unique

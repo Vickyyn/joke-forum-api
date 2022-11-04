@@ -20,6 +20,10 @@ class Joke(db.Model):
     # Display tags 
     joke_tags = db.relationship('Joke_tag', back_populates='joke', cascade='all, delete')
 
+
+
+
+
 class JokeSchema(ma.Schema):
     user = fields.Nested('UserSchema', only=['username'])
     # Repeated maximum length for better Error display message handling
