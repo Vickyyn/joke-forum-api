@@ -5,6 +5,8 @@ from models.upvote import Upvote
 from models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow.exceptions import ValidationError
+from models.tag import Tag
+from models.joke_tag import Joke_tag
 
 # Nested blueprint from jokes_bp
 joke_ids_bp = Blueprint('joke_ids', __name__, url_prefix='/<int:id>')
@@ -101,7 +103,50 @@ def upvote_joke(id):
 
 
 
-# # Allow owners or admin to edit tags        
-# @joke_ids_bp.route('/tags/', methods=['POST', 'PATCH', 'PUT'])       
+# Allow owners or admin to add tag     
+# @joke_ids_bp.route('/tags/', methods=['POST'])       
 # @jwt_required()
-# def upvote_joke(id):
+# def edit_tags(id):
+    # joke = check_valid_joke(id)
+    # user_id = int(get_jwt_identity())
+    # stmt = db.select(User).filter_by(id=user_id)
+    # user = db.session.scalar(stmt)
+    # if joke.owner == user_id or user.is_admin:
+    #     subq = db.select(Tag).where(Tag.name == request.json.get('tags'))
+    #     stmt = db.select(Joke_tag).filter_by(joke_id == id, tag_id == subq.id)
+    #     existing = db.session.scalars(stmt)
+    #     if not existing:
+
+    #     tag_data = request.json.get('tags')
+    #     if tag_data:
+    #         for tag in tag_data:
+    #             try:
+    #                 stmt = db.select(Tag).filter_by(name=tag)
+    #                 existing_tag = db.session.scalar(stmt)
+    #                 if existing_tag:
+    #                     entry = Tag(
+    #                         joke_id = id,
+    #                         tag_id = existing_tag.id
+    #                     )
+    #                     db.session.add(entry)
+    #                     db.session.commit(entry)
+    #             entry = Tag(
+
+    #             )
+
+# # Allow owners or admin to delete tag
+
+# joke = check_valid_joke(id)
+# user_id = get_jwt_identity()
+# tag_data = request.json.get('tags')
+# if tag_data:
+#     for tag in tag_data:
+#         entry = Tag(
+#             joke_id = id,
+#             user_id = user_id,
+
+#         )
+
+
+
+

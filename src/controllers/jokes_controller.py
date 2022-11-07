@@ -45,9 +45,25 @@ def get_all_tags():
 # # Allow public to view all jokes with corresponding tag
 @jokes_bp.route('/tags/<string:name>/')
 def get_jokes_with_tag(name):
-    # Retrieve id of tag from name
-    # stmt = db.select(Tag).filter_by(name=name)
-    # tag = db.session.scalar(stmt)
+    stmt = db.select(Tag).filter_by(name=name)
+    tag = db.session.scalar(stmt)
+
+    # joke = db.select(Joke_tag.joke).filter_by(tag_id=tag.id)
+    # jokes = db.session.scalars(joke)
+    
+
+    # jokes = (
+    #     db.session.query(Joke).join(Joke.joke_tags).filter(Joke_tag.tag_id == tag.id).order_by(Joke.upvotes).all()
+    # )
+    # db.session.scalars(jokes)
+
+    subq = db.select(Joke_tag).filter_by(tag_id=tag.id).subquery()
+    stmt = db.select(Joke).join(subq, Joke.id == subq.c.joke_id)
+    jokes = db.session.scalars(stmt)
+
+    # jokes = db.select(Joke).join(Joke.joke_tags).join(Joke_tag.tag).where(Tag.name == name)
+    # stmt = db.session.scalars(jokes)
+
     # # Retrieve all joke ids with corresponding tag id
     # stmt = db.select(Joke_tag).filter_by(tag_id=tag.id)
     # x = db.session.scalars(stmt)
@@ -56,43 +72,11 @@ def get_jokes_with_tag(name):
     # joke_ids = Joke_tagSchema(many=True).dump(x)
     # valid_ids = [entry['joke_id'] for entry in joke_ids]
 
-
     # # Retrieve all jokes with ids in the list
-    # # for i in valid_ids:
-    # #     stmt = db.select(Joke).filter_by(id=i)
-    # # stmt = db.select(Joke).filter_by(id==[i for i in valid_ids])
-    # # jokes = db.session.scalars(stmt)
-
-    # x = JokeSchema(many=True).dump(jokes_ids)
-    # # Retrieve all jokes from joke ids
-    # stmt = db.select(Joke).filter_by(id=x.joke_id)
-    # jokes = db.session.scalars(stmt)
-
-    # tag = db.session.query(Tag).filter(name=name)
-    
-
-    # return JokeSchema(many=True).dump(jokes)
-
-
-    stmt = db.select(Tag).filter_by(name=name)
-    tag = db.session.scalar(stmt)
-
-    # Retrieve all joke ids with corresponding tag id
-    stmt = db.select(Joke_tag).filter_by(tag_id=tag.id)
-    x = db.session.scalars(stmt)
-
-    # Convert corresponding values into a list
-    joke_ids = Joke_tagSchema(many=True).dump(x)
-    valid_ids = [entry['joke_id'] for entry in joke_ids]
-    print(valid_ids)
-    # Retrieve all jokes with ids in the list
-
-    stmt = db.select(Joke).filter(Joke.id in [1]) # NOT WORKING HERE
-    jokes = db.session.scalars(stmt)
-    jokes = []
-    for id in valid_ids:
-        xy = db.select(Joke).where(Joke.id == id)
-        jokes.append(db.session.scalar(xy))
+    # jokes = []
+    # for id in valid_ids:
+    #     joke = db.select(Joke).where(Joke.id == id)
+    #     jokes.append(db.session.scalar(joke))
 
     return JokeSchema(many=True).dump(jokes)
 

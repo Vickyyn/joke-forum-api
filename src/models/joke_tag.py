@@ -1,6 +1,8 @@
 from init import db, ma
 from marshmallow import validates
 from marshmallow.exceptions import ValidationError
+from marshmallow import fields
+
 
 class Joke_tag(db.Model):
     __tablename__ = 'joke_tags'
@@ -9,45 +11,22 @@ class Joke_tag(db.Model):
     tag_id = db.Column(db.Integer, db.ForeignKey('tags.id', ondelete='CASCADE'), nullable=False)
 
     joke = db.relationship('Joke', back_populates='joke_tags')
+    tag = db.relationship('Tag', back_populates='joke_tags')
 
 class Joke_tagSchema(ma.Schema):
-
-    # @validates('joke_id')
-    # def validate_tag(self, name, description):
-    #     if name and description:
-    #         raise ValidationError('You already got this')
+    tag = fields.Nested('TagSchema', only=['name'])
 
     class Meta:
-        fields = ('id', 'joke_id', 'tag_id')
+        fields = ('id', 'joke_id', 'tag_id', 'tag')
         ordered = True
 
+# joke_tag = Table(
+#     "joke_tags",
+#     db.Base.metadata,
+#     db.Column('joke_id', db.ForeignKey('jokes.id'), primary_key=True),
+#     db.Column('tag_id', db.ForeighKey('tags.id'), primary_key=True)
+# ) 
 
 
-# from joke import Joke
-
-# association_table = Table(
-#     "association_table",
-#     Base.metadata,
-#     Column("left_id", ForeignKey("left_table.id"), primary_key=True),
-#     Column("right_id", ForeignKey("right_table.id"), primary_key=True),
-# )
-
-
-# # class Tag(db.Model):
-# #     __tablename__ = "left_table"
-
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     children: Mapped[list[Child]] = relationship(
-#         secondary=association_table, back_populates="parents"
-#     )
-
-
-# class Joke(Base):
-#     __tablename__ = "right_table"
-
-    # id: Mapped[int] = mapped_column(primary_key=True)
-    # parents: Mapped[list[Parent]] = relationship(
-    #     secondary=association_table, back_populates="children"
-    # )
 
 # Note this table needs to be unique
