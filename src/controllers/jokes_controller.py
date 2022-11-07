@@ -58,7 +58,7 @@ def get_jokes_with_tag(name):
     # db.session.scalars(jokes)
 
     subq = db.select(Joke_tag).filter_by(tag_id=tag.id).subquery()
-    stmt = db.select(Joke).join(subq, Joke.id == subq.c.joke_id)
+    stmt = db.select(Joke).join(subq, Joke.id == subq.c.joke_id).order_by(Joke.upvotes)
     jokes = db.session.scalars(stmt)
 
     # jokes = db.select(Joke).join(Joke.joke_tags).join(Joke_tag.tag).where(Tag.name == name)

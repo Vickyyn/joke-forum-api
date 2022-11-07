@@ -10,6 +10,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
     jokes = db.relationship('Joke', back_populates='user', cascade=False)
+    comments = db.relationship('Comment', back_populates='user', cascade='all, delete')
 
 
 class UserSchema(ma.Schema):

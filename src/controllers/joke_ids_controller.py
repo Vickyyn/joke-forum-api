@@ -6,7 +6,8 @@ from models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow.exceptions import ValidationError
 from models.tag import Tag
-from models.joke_tag import Joke_tag
+from models.joke_tag import Joke_tag, Joke_tagSchema
+from sqlalchemy.orm import joinedload, subqueryload
 
 # Nested blueprint from jokes_bp
 joke_ids_bp = Blueprint('joke_ids', __name__, url_prefix='/<int:id>')
@@ -106,33 +107,52 @@ def upvote_joke(id):
 # Allow owners or admin to add tag     
 # @joke_ids_bp.route('/tags/', methods=['POST'])       
 # @jwt_required()
-# def edit_tags(id):
-    # joke = check_valid_joke(id)
-    # user_id = int(get_jwt_identity())
-    # stmt = db.select(User).filter_by(id=user_id)
-    # user = db.session.scalar(stmt)
-    # if joke.owner == user_id or user.is_admin:
-    #     subq = db.select(Tag).where(Tag.name == request.json.get('tags'))
-    #     stmt = db.select(Joke_tag).filter_by(joke_id == id, tag_id == subq.id)
-    #     existing = db.session.scalars(stmt)
-    #     if not existing:
+# def add_tag(id):
+#     joke = check_valid_joke(id)
+#     user_id = int(get_jwt_identity())
+#     stmt = db.select(User).filter_by(id=user_id)
+#     user = db.session.scalar(stmt)
+#     if joke.owner == user_id or user.is_admin:
+#         # subq = db.session.query(Joke_tag).join(Joke_tag.tag).options(joinedload(Joke_tag.tag)).filter(Joke_tag.joke_id == id).filter(Tag.name == request.json.get('tags'))
+#         # existing = db.session.scalar(subq)
+#         # subq = db.select(Tag).where(Tag.name == request.json.get('tags')).subquery()
+#         # stmt = db.select(Joke_tag).join(subq, Joke_tag.tag_id == subq.id)
+#         # existing = db.session.scalars(stmt)
+#         # existing = db.session.query(Joke_tag).options(subqueryload(Joke_tag.tag)).filter_by(tag == request.json.get('tags'))
+#         data = request.json.get('tags')
+#         stmt = db.select(Tag).filter_by(name=data)
+#         tag = db.session.scalar(stmt)
+#         stmts = db.select(Joke_tag).filter_by(joke_id=id, tag_id=tag.id)
+#         existing = db.session.scalar(stmts)
+#         if existing:
+#             return {'message': 'this tag already exists'}, 405
+#         elif subq:
+#             new_tag_id = Joke_tag(
+#                 joke_id = id,
+#                 tag_id = subq.id
+#             )
+#             db.session.add(new_tag_id)
+#             db.session.commit()
+#             return Joke_tagSchema().dump(new_tag_id)
+#         else:
+#             new_tag = Tag(
+#                 name = request.json.get('tags')
+#             )
+#             db.session.add(new_tag)
+#             db.session.commit()
 
-    #     tag_data = request.json.get('tags')
-    #     if tag_data:
-    #         for tag in tag_data:
-    #             try:
-    #                 stmt = db.select(Tag).filter_by(name=tag)
-    #                 existing_tag = db.session.scalar(stmt)
-    #                 if existing_tag:
-    #                     entry = Tag(
-    #                         joke_id = id,
-    #                         tag_id = existing_tag.id
-    #                     )
-    #                     db.session.add(entry)
-    #                     db.session.commit(entry)
-    #             entry = Tag(
+#             subq = db.select(Tag).where(Tag.name == request.json.get('tags')).subquery()
 
-    #             )
+#             new_tag_id = Joke_tag(
+#                 joke_id = id,
+#                 tag_id = subq.id
+#             )
+#             db.session.add(new_tag_id)
+#             db.session.commit()
+
+#             return Joke_tagSchema().dump(new_tag_id)
+
+
 
 # # Allow owners or admin to delete tag
 
