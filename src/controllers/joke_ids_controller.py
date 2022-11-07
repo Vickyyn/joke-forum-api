@@ -1,7 +1,7 @@
 from flask import Blueprint, request, abort
 from init import db
 from models.joke import Joke, JokeSchema
-from models.upvote import Upvote
+from models.upvote import Upvote, UpvoteSchema
 from models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow.exceptions import ValidationError
@@ -62,7 +62,6 @@ def update_joke(id):
 
 # Allow users to upvote jokes
 # Each user can only upvote a joke once
-# Users can also remove their upvotes
 @joke_ids_bp.route('/upvote/', methods=['POST'])       
 @jwt_required()
 def upvote_joke(id):
@@ -71,36 +70,37 @@ def upvote_joke(id):
     # see if this particular upvote already exists
     stmt = db.select(Upvote).filter_by(joke_id=id, user_id=user_id)
     upvote = db.session.scalar(stmt)
-    if request.json.get('upvote') == 'yes':
-        if upvote:
-            # response 405 is method not allowed
-            return {'message': 'You cannot upvote the same joke twice'}, 405
-        else:
-            # Increase upvote count by 1 and create new upvote instance
-            joke.upvotes = joke.upvotes + 1
-            new_upvote = Upvote(
-                joke_id = id,
-                user_id = user_id
-            )
-            db.session.add(new_upvote)
-            db.session.commit()
-            return {'message': f'You have upvoted joke {id}'}
-    elif request.json.get('upvote') == 'no':
-        if upvote:
-            # Decreast upvote count by 1 and delete upvote instance
-            joke.upvotes = joke.upvotes - 1
-            db.session.delete(upvote)
-            db.session.commit()
-            return {'message':f'You have removed your upvote for joke {id}'}
-        else:
-            return {'message': 'You have not upvoted this joke'}, 405
+    if upvote:
+        # response 405 is method not allowed
+        return {'message': 'You cannot upvote the same joke twice'}, 405
     else:
-        raise ValidationError("You must input 'upvote' as 'yes' or 'no'")
+        # Increase upvote count by 1 and create new upvote instance
+        joke.upvotes = joke.upvotes + 1
+        new_upvote = Upvote(
+            joke_id = id,
+            user_id = user_id
+        )
+        db.session.add(new_upvote)
+        db.session.commit()
+        return UpvoteSchema().dump(new_upvote)
 
+# Remove upvotes
+@joke_ids_bp.route('/upvote/', methods=['DELETE'])       
+@jwt_required()
+def remove_upvote(id):
+    joke = check_valid_joke(id)
+    user_id = get_jwt_identity()
+    # see if this particular upvote already exists
+    stmt = db.select(Upvote).filter_by(joke_id=id, user_id=user_id)
+    upvote = db.session.scalar(stmt)
+    if upvote:
+        # Decreast upvote count by 1 and delete upvote instance
+        joke.upvotes = joke.upvotes - 1
+        db.session.delete(upvote)
+        db.session.commit()
+        return {'message':f'You have removed your upvote for joke {id}'}
+    return {'message': 'You have not upvoted this joke'}, 405
 
-# @joke_ids_bp.route('/upvote/', methods=['DELETE'])       
-# @jwt_required()
-# def delete_upvote(id):
 
 
 

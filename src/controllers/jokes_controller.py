@@ -42,6 +42,12 @@ def get_all_tags():
     tags = db.session.scalars(stmt)
     return TagSchema(many=True).dump(tags)
 
+# Allow users to add tags
+@jokes_bp.route('/tags/', methods=['POST'])
+    tag_name = request.json['name']
+
+
+
 # # Allow public to view all jokes with corresponding tag
 @jokes_bp.route('/tags/<string:name>/')
 def get_jokes_with_tag(name):
@@ -79,4 +85,3 @@ def get_jokes_with_tag(name):
     #     jokes.append(db.session.scalar(joke))
 
     return JokeSchema(many=True).dump(jokes)
-

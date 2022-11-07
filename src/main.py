@@ -6,6 +6,7 @@ from controllers.jokes_controller import jokes_bp
 from controllers.users_controller import users_bp
 from controllers.joke_ids_controller import joke_ids_bp
 from controllers.auth_controller import auth_bp
+from controllers.tags_controller import tags_bp
 from marshmallow.exceptions import ValidationError
 
 def create_app():
@@ -26,6 +27,7 @@ def create_app():
     jokes_bp.register_blueprint(joke_ids_bp)
     app.register_blueprint(jokes_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(tags_bp)
     
     @app.route('/')
     def hello():
