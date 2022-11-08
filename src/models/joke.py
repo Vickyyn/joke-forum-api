@@ -16,12 +16,8 @@ class Joke(db.Model):
 
     # Display the username as well as the owner(user_id)
     user = db.relationship('User', back_populates='jokes')
-    # Display the number of upvotes for joke
-    # upvotes = db.relationship('Upvote', back_populates='joke')
-    # upvotes = db.Column(db.Integer, default=0)
-    # Display tags 
-    joke_tags = db.relationship('Joke_tag', back_populates='joke', cascade='all, delete')
-    comments = db.relationship('Comment', back_populates='joke', cascade='all, delete')
+    joke_tags = db.relationship('Joke_tag', back_populates='joke') # cascade='all, delete')
+    comments = db.relationship('Comment', back_populates='joke') #, cascade='all, delete')
 
 
 class JokeSchema(ma.Schema):
@@ -29,11 +25,9 @@ class JokeSchema(ma.Schema):
     # Repeated maximum length for better Error display message handling
     title = fields.String(required=True, validate=Length(max=150, error='titles can only be up to 150 characters'))
     joke_tags = fields.List(fields.Nested(('Joke_tagSchema'), only=['tag']))
+    # Include upvotes in display of jokes, calculated from database
     upvotes = fields.Function(lambda obj: db.session.query(Upvote).filter_by(joke_id=obj.id).count())
     comments = fields.List(fields.Nested('CommentSchema', exclude=['joke_id']))
-
-
-    # Get joke tags
 
     class Meta:
         fields = ('id', 'title', 'body', 'joke_tags', 'date', 'owner', 'user', 'upvotes', 'comments')

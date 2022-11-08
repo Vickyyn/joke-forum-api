@@ -68,7 +68,6 @@ def upvote_joke(id):
     user_id = get_jwt_identity()
 
     # this does not go through if error occurs at upvoteschema below
-    joke.upvotes = joke.upvotes + 1
     new_upvote = Upvote(
         joke_id = id,
         user_id = user_id
@@ -89,8 +88,7 @@ def remove_upvote(id):
     stmt = db.select(Upvote).filter_by(joke_id=id, user_id=user_id)
     upvote = db.session.scalar(stmt)
     if upvote:
-        # Decreast upvote count by 1 and delete upvote instance
-        joke.upvotes = joke.upvotes - 1
+        # Delete upvote instance
         db.session.delete(upvote)
         db.session.commit()
         return {'message':f'You have removed your upvote for joke {id}'}

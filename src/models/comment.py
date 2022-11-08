@@ -16,7 +16,7 @@ class Comment(db.Model):
 
 class CommentSchema(ma.Schema):
     user = fields.Nested('UserSchema', only=['username'])
-    joke = fields.Nested('JokeSchema', only=['id'])
+    # joke = fields.Nested('JokeSchema', only=['id'])
 
     class Meta:
         fields = ('id', 'joke_id', 'user_id', 'date', 'body', 'user')
