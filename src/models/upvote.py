@@ -17,7 +17,7 @@ class UpvoteSchema(ma.Schema):
     def is_unique_instance(self, obj):
         stmt = db.select(db.func.count()).select_from(Upvote).filter_by(joke_id=obj.joke_id, user_id=obj.user_id)
         exist = db.session.scalar(stmt)
-        if exist > 1:
+        if exist >= 1:
             raise ValidationError('This particular instance already exists')
 
     class Meta:

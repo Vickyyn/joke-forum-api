@@ -8,7 +8,7 @@ class Tag(db.Model):
     name = db.Column(db.String(45), unique=True, nullable=False)
     description = db.Column(db.Text)
     
-    joke_tags = db.relationship('Joke_tag', back_populates='tag', cascade='all, delete')
+    joke_tags = db.relationship('Joke_tag', back_populates='tag') #, cascade='all, delete')
 
 
 class TagSchema(ma.Schema):

@@ -22,7 +22,7 @@ class Joke_tagSchema(ma.Schema):
     def is_unique_instance(self, obj):
         stmt = db.select(db.func.count()).select_from(Joke_tag).filter_by(joke_id=obj.joke_id, tag_id=obj.tag_id)
         exist = db.session.scalar(stmt)
-        if exist > 1:
+        if exist >= 1:
             raise ValidationError('This particular instance already exists')
         return True
 

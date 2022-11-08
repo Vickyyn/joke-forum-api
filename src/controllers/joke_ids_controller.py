@@ -68,6 +68,7 @@ def upvote_joke(id):
     joke = check_valid_joke(id)
     user_id = get_jwt_identity()
 
+    # this does not go through if error occurs at upvoteschema below
     joke.upvotes = joke.upvotes + 1
     new_upvote = Upvote(
         joke_id = id,
@@ -77,7 +78,7 @@ def upvote_joke(id):
     UpvoteSchema().dump(new_upvote)
     db.session.add(new_upvote)
     db.session.commit()
-    return UpvoteSchema().dump(new_upvote)
+    return UpvoteSchema(exclude=['validation']).dump(new_upvote)
 
 # Remove upvotes
 @joke_ids_bp.route('/upvote/', methods=['DELETE'])       
@@ -97,7 +98,7 @@ def remove_upvote(id):
     return {'message': 'You have not upvoted this joke'}, 405
 
 
-# Allow users or admin to add tag
+# Allow owners or admin to add tag to a joke
 @joke_ids_bp.route('/tags/', methods=['POST'])       
 @jwt_required()
 def add_tag(id):
@@ -106,83 +107,50 @@ def add_tag(id):
     stmt = db.select(User).filter_by(id=user_id)
     user = db.session.scalar(stmt)
     if joke.owner == user_id or user.is_admin:
-        stmt = db.select(Tag).filter_by(name=request.json.get('tag'))
+        stmt = db.session.query(Tag).filter_by(name=request.json['tag'])
         tag = db.session.scalar(stmt)
-        new_tag = Joke_tag(
+        # If tag does not already exist, create a new tag instance
+        if not tag:
+            new_tag = Tag(
+                name = request.json.get('tag')
+            )
+            db.session.add(new_tag)
+            db.session.commit()
+        
+            # retrieve tag id that was just created
+            stmt = db.session.query(Tag).filter_by(name=request.json['tag'])
+            tag = db.session.scalar(stmt)
+
+        new_joke_tag = Joke_tag(
             joke_id = id,
             tag_id = tag.id
         )
-        # Ensure the new tag is valid prior to committing (if remove this line will still commit despite error)
-        Joke_tagSchema().dump(new_tag)
-        db.session.add(new_tag)
+        # Ensure valid unique joke tag prior to committing; error if not
+        Joke_tagSchema().dump(new_joke_tag)
+        db.session.add(new_joke_tag)
         db.session.commit()
-        return Joke_tagSchema().dump(new_tag)
+        return Joke_tagSchema(exclude=['validation']).dump(new_joke_tag)
+    raise ValidationError('You do not have permission to do this')
 
 
+# Allow owners or admin to delete tags
+@joke_ids_bp.route('/tags/', methods=['DELETE'])       
+@jwt_required()
+def delete_tag(id):
+    joke = check_valid_joke(id)
+    user_id = int(get_jwt_identity())
+    stmt = db.select(User).filter_by(id=user_id)
+    user = db.session.scalar(stmt)
+    if joke.owner == user_id or user.is_admin:
+        subq = db.select(Tag).filter_by(name=request.json['tag']).subquery()
+        stmt = db.select(Joke_tag).join(subq, Joke_tag.tag_id == subq.c.id).filter(Joke_tag.joke_id==id)
+        tag = db.session.scalar(stmt)
 
-# Allow owners or admin to add tag     
-# @joke_ids_bp.route('/tags/', methods=['POST'])       
-# @jwt_required()
-# def add_tag(id):
-#     joke = check_valid_joke(id)
-#     user_id = int(get_jwt_identity())
-#     stmt = db.select(User).filter_by(id=user_id)
-#     user = db.session.scalar(stmt)
-#     if joke.owner == user_id or user.is_admin:
-#         # subq = db.session.query(Joke_tag).join(Joke_tag.tag).options(joinedload(Joke_tag.tag)).filter(Joke_tag.joke_id == id).filter(Tag.name == request.json.get('tags'))
-#         # existing = db.session.scalar(subq)
-#         # subq = db.select(Tag).where(Tag.name == request.json.get('tags')).subquery()
-#         # stmt = db.select(Joke_tag).join(subq, Joke_tag.tag_id == subq.id)
-#         # existing = db.session.scalars(stmt)
-#         # existing = db.session.query(Joke_tag).options(subqueryload(Joke_tag.tag)).filter_by(tag == request.json.get('tags'))
-#         data = request.json.get('tags')
-#         stmt = db.select(Tag).filter_by(name=data)
-#         tag = db.session.scalar(stmt)
-#         stmts = db.select(Joke_tag).filter_by(joke_id=id, tag_id=tag.id)
-#         existing = db.session.scalar(stmts)
-#         if existing:
-#             return {'message': 'this tag already exists'}, 405
-#         elif subq:
-#             new_tag_id = Joke_tag(
-#                 joke_id = id,
-#                 tag_id = subq.id
-#             )
-#             db.session.add(new_tag_id)
-#             db.session.commit()
-#             return Joke_tagSchema().dump(new_tag_id)
-#         else:
-#             new_tag = Tag(
-#                 name = request.json.get('tags')
-#             )
-#             db.session.add(new_tag)
-#             db.session.commit()
-
-#             subq = db.select(Tag).where(Tag.name == request.json.get('tags')).subquery()
-
-#             new_tag_id = Joke_tag(
-#                 joke_id = id,
-#                 tag_id = subq.id
-#             )
-#             db.session.add(new_tag_id)
-#             db.session.commit()
-
-#             return Joke_tagSchema().dump(new_tag_id)
-
-
-
-# # Allow owners or admin to delete tag
-
-# joke = check_valid_joke(id)
-# user_id = get_jwt_identity()
-# tag_data = request.json.get('tags')
-# if tag_data:
-#     for tag in tag_data:
-#         entry = Tag(
-#             joke_id = id,
-#             user_id = user_id,
-
-#         )
-
-
+        if tag:
+            db.session.delete(tag)
+            db.session.commit()
+            return {"message": f"you have deleted the tag {request.json.get('tag')} from joke {id}"}
+        raise ValidationError('This tag did not exist')
+    raise ValidationError('You do not have permission to do this')
 
 
