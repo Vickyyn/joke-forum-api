@@ -41,3 +41,7 @@ class JokeSchema(ma.Schema):
 
 
 # list owner name rather than owner id
+# SELECT joke_id, count(joke_id)                                                                      
+# FROM jokes LEFT JOIN upvotes
+# ON jokes.id = upvotes.joke_id
+# GROUP BY joke_id;

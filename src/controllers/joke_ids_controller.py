@@ -77,7 +77,7 @@ def upvote_joke(id):
     UpvoteSchema().dump(new_upvote)
     db.session.add(new_upvote)
     db.session.commit()
-    return UpvoteSchema(exclude=['validation']).dump(new_upvote)
+    return UpvoteSchema(exclude=['validation']).dump(new_upvote), 201
 
 # Remove upvotes
 @joke_ids_bp.route('/upvote/', methods=['DELETE'])       
@@ -131,7 +131,7 @@ def add_tag(id):
         Joke_tagSchema().dump(new_joke_tag)
         db.session.add(new_joke_tag)
         db.session.commit()
-        return Joke_tagSchema(exclude=['validation']).dump(new_joke_tag)
+        return Joke_tagSchema(exclude=['validation']).dump(new_joke_tag), 201
 
 
     raise ValidationError('You do not have permission to do this')
@@ -156,5 +156,4 @@ def delete_tag(id):
             return {"message": f"you have deleted the tag {request.json.get('tag')} from joke {id}"}
         raise ValidationError('This tag did not exist')
     raise ValidationError('You do not have permission to do this')
-
 

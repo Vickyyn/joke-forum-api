@@ -66,7 +66,8 @@ def seed_db():
             title = 'Why was 6 afraid of 7?',
             body = 'because 7 8 9',
             date = date.today(),
-            owner = 3
+            owner = 3,
+            upvotes = 1
         ),
         Joke(
             title = "What is a sheep's favourite newspaper?",
