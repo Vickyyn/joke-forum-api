@@ -2,6 +2,7 @@ from init import db, ma
 from marshmallow import validates
 from marshmallow.exceptions import ValidationError
 from marshmallow import fields
+from sqlalchemy import CheckConstraint
 
 
 class Joke_tag(db.Model):
@@ -15,18 +16,19 @@ class Joke_tag(db.Model):
 
 class Joke_tagSchema(ma.Schema):
     tag = fields.Nested('TagSchema', only=['name'])
+    # Ensure all instances are unique
+    validation = fields.Method("is_unique_instance")
+    
+    def is_unique_instance(self, obj):
+        stmt = db.select(db.func.count()).select_from(Joke_tag).filter_by(joke_id=obj.joke_id, tag_id=obj.tag_id)
+        exist = db.session.scalar(stmt)
+        if exist > 1:
+            raise ValidationError('This particular instance already exists')
+        return True
 
     class Meta:
-        fields = ('id', 'joke_id', 'tag_id', 'tag')
+        fields = ('id', 'joke_id', 'tag_id', 'tag', 'validation')
         ordered = True
-
-# joke_tag = Table(
-#     "joke_tags",
-#     db.Base.metadata,
-#     db.Column('joke_id', db.ForeignKey('jokes.id'), primary_key=True),
-#     db.Column('tag_id', db.ForeighKey('tags.id'), primary_key=True)
-# ) 
-
 
 
 # Note this table needs to be unique

@@ -43,8 +43,8 @@ def get_all_tags():
     return TagSchema(many=True).dump(tags)
 
 # Allow users to add tags
-@jokes_bp.route('/tags/', methods=['POST'])
-    tag_name = request.json['name']
+# @jokes_bp.route('/tags/', methods=['POST'])
+#     tag_name = request.json['name']
 
 
 

@@ -16,6 +16,7 @@ class TagSchema(ma.Schema):
     # Limit 45 as longest english word is 45 letters 
     name = fields.String(required=True, validate=Length(max=45, error='tags can only be up to 45 characters long'))
 
+
     class Meta:
         fields = ('id', 'name', 'description')
         ordered = True
