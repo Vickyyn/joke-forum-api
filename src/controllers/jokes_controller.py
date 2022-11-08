@@ -49,14 +49,19 @@ def get_all_tags():
 # # Allow public to view all jokes with corresponding tag
 @jokes_bp.route('/tags/<string:name>/')
 def get_jokes_with_tag(name):
-    stmt = db.select(Tag).filter_by(name=name)
-    tag = db.session.scalar(stmt)
+    # stmt = db.select(Tag).filter_by(name=name)
+    # tag = db.session.scalar(stmt)
 
-    subq = db.select(Joke_tag).filter_by(tag_id=tag.id).subquery()
-    stmt = db.select(Joke).join(subq, Joke.id == subq.c.joke_id).order_by(Joke.upvotes)
+    stmt = db.select(Joke).join(Joke_tag).join(Tag).filter_by(name=name).outerjoin(Upvote).group_by(Joke.id).order_by(db.func.count(Joke.id).desc())
+
+    # subq = db.select(Joke_tag).filter_by(tag_id=tag.id).subquery()
+    # stmt = db.select(Joke).join(subq, Joke.id == subq.c.joke_id).outerjoin(Upvote).group_by(Joke.id).order_by(db.func.count(Joke.id).desc())
+    # stmt = db.select(Joke).join(subq, Joke.id == subq.c.joke_id).order_by(Joke.upvotes)
     jokes = db.session.scalars(stmt)
 
     return JokeSchema(many=True).dump(jokes)
+
+    
 
 
 # SELECT *

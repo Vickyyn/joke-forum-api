@@ -18,7 +18,7 @@ class Joke(db.Model):
     user = db.relationship('User', back_populates='jokes')
     # Display the number of upvotes for joke
     # upvotes = db.relationship('Upvote', back_populates='joke')
-    upvotes = db.Column(db.Integer, default=0)
+    # upvotes = db.Column(db.Integer, default=0)
     # Display tags 
     joke_tags = db.relationship('Joke_tag', back_populates='joke', cascade='all, delete')
     comments = db.relationship('Comment', back_populates='joke', cascade='all, delete')
