@@ -13,7 +13,7 @@ def get_all_users():
     users = db.session.scalars(stmt)
     # Read list of users only, thus jokes each users has contributed is excluded
     # List of jokes for each user can be seen at the individual user route
-    return UserSchema(many=True, exclude=['password', 'jokes']).dump(users)
+    return UserSchema(many=True, exclude=['password', 'jokes', 'is_admin']).dump(users)
 
 # Allow public to view individual users
 # View by id or by username

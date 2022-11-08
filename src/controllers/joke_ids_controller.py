@@ -106,18 +106,21 @@ def add_tag(id):
     stmt = db.select(User).filter_by(id=user_id)
     user = db.session.scalar(stmt)
     if joke.owner == user_id or user.is_admin:
-        stmt = db.session.query(Tag).filter_by(name=request.json['tag'])
+        data = request.json.get('tag')
+        if not data:
+            raise ValidationError('Please input a tag')
+        stmt = db.session.query(Tag).filter_by(name=data)
         tag = db.session.scalar(stmt)
         # If tag does not already exist, create a new tag instance
         if not tag:
             new_tag = Tag(
-                name = request.json.get('tag')
+                name = data
             )
             db.session.add(new_tag)
             db.session.commit()
         
             # retrieve tag id that was just created
-            stmt = db.session.query(Tag).filter_by(name=request.json['tag'])
+            stmt = db.session.query(Tag).filter_by(name=data)
             tag = db.session.scalar(stmt)
 
         new_joke_tag = Joke_tag(
@@ -129,6 +132,8 @@ def add_tag(id):
         db.session.add(new_joke_tag)
         db.session.commit()
         return Joke_tagSchema(exclude=['validation']).dump(new_joke_tag)
+
+
     raise ValidationError('You do not have permission to do this')
 
 
