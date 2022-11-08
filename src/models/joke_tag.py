@@ -1,9 +1,6 @@
 from init import db, ma
-from marshmallow import validates
 from marshmallow.exceptions import ValidationError
 from marshmallow import fields
-from sqlalchemy import CheckConstraint
-
 
 class Joke_tag(db.Model):
     __tablename__ = 'joke_tags'
@@ -30,5 +27,3 @@ class Joke_tagSchema(ma.Schema):
         fields = ('id', 'joke_id', 'tag_id', 'tag', 'validation')
         ordered = True
 
-
-# Note this table needs to be unique
