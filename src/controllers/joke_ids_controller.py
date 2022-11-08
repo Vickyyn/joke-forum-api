@@ -7,7 +7,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow.exceptions import ValidationError
 from models.tag import Tag
 from models.joke_tag import Joke_tag, Joke_tagSchema
-from sqlalchemy.orm import joinedload, subqueryload
 
 # Nested blueprint from jokes_bp
 joke_ids_bp = Blueprint('joke_ids', __name__, url_prefix='/<int:id>')

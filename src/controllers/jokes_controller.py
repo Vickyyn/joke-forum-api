@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from init import db
 from models.joke import Joke, JokeSchema
 from models.tag import Tag, TagSchema
-from models.joke_tag import Joke_tag, Joke_tagSchema
+from models.joke_tag import Joke_tag
 from datetime import date
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -20,6 +20,7 @@ def get_all_jokes():
     # db.session.query(Upvote).filter_by(joke_id=obj.id).count()
     return JokeSchema(many=True).dump(jokes)
 
+
 # Allow users to create posts
 @jokes_bp.route('/', methods=['POST'])
 @jwt_required()
@@ -35,17 +36,13 @@ def create_joke():
     db.session.commit()
     return JokeSchema().dump(joke), 201
 
+
 # Allow public to view all tags
 @jokes_bp.route('/tags/')
 def get_all_tags():
     stmt = db.select(Tag)
     tags = db.session.scalars(stmt)
     return TagSchema(many=True).dump(tags)
-
-# Allow users to add tags
-# @jokes_bp.route('/tags/', methods=['POST'])
-#     tag_name = request.json['name']
-
 
 
 # # Allow public to view all jokes with corresponding tag
@@ -54,34 +51,8 @@ def get_jokes_with_tag(name):
     stmt = db.select(Tag).filter_by(name=name)
     tag = db.session.scalar(stmt)
 
-    # joke = db.select(Joke_tag.joke).filter_by(tag_id=tag.id)
-    # jokes = db.session.scalars(joke)
-    
-
-    # jokes = (
-    #     db.session.query(Joke).join(Joke.joke_tags).filter(Joke_tag.tag_id == tag.id).order_by(Joke.upvotes).all()
-    # )
-    # db.session.scalars(jokes)
-
     subq = db.select(Joke_tag).filter_by(tag_id=tag.id).subquery()
     stmt = db.select(Joke).join(subq, Joke.id == subq.c.joke_id).order_by(Joke.upvotes)
     jokes = db.session.scalars(stmt)
-
-    # jokes = db.select(Joke).join(Joke.joke_tags).join(Joke_tag.tag).where(Tag.name == name)
-    # stmt = db.session.scalars(jokes)
-
-    # # Retrieve all joke ids with corresponding tag id
-    # stmt = db.select(Joke_tag).filter_by(tag_id=tag.id)
-    # x = db.session.scalars(stmt)
-
-    # # Convert corresponding values into a list
-    # joke_ids = Joke_tagSchema(many=True).dump(x)
-    # valid_ids = [entry['joke_id'] for entry in joke_ids]
-
-    # # Retrieve all jokes with ids in the list
-    # jokes = []
-    # for id in valid_ids:
-    #     joke = db.select(Joke).where(Joke.id == id)
-    #     jokes.append(db.session.scalar(joke))
 
     return JokeSchema(many=True).dump(jokes)
