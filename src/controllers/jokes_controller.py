@@ -84,6 +84,27 @@ def delete_comment():
         return {'error': 'You do not have permission to do this'}, 403      
     return {'error': 'Comment not found'}, 404      
 
+# Allow users to edit their comment (note posting comments is under joke_ids_controllers)
+@jokes_bp.route('/comments/', methods=['PUT', 'PATCH'])
+@jwt_required()
+def edit_comment():
+    user_id = int(get_jwt_identity())
+    # Fetch user
+    stmt = db.select(User).filter_by(id=user_id)
+    user = db.session.scalar(stmt)
+    # Find comment
+    stmt = db.select(Comment).filter_by(id=request.json['id'])
+    comment = db.session.scalar(stmt)
+
+    if comment:
+        if comment.user_id == user_id or user.is_admin:
+            if len(request.json['body']) == 0:
+                return {'error': 'Comments cannot be blank'}, 400
+            comment.body = request.json['body']
+            db.session.commit()
+            return CommentSchema().dump(comment)
+        return {'error': 'You do not have permission to do this'}, 403      
+    return {'error': 'Comment not found'}, 404    
 
 
 # SELECT *
