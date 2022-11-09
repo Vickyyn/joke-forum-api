@@ -4,6 +4,8 @@ from models.joke import Joke, JokeSchema
 from models.tag import Tag, TagSchema
 from models.joke_tag import Joke_tag
 from models.upvote import Upvote
+from models.user import User
+from models.comment import Comment, CommentSchema
 from datetime import date
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -46,14 +48,42 @@ def get_all_tags():
     return TagSchema(many=True).dump(tags)
 
 
-# # Allow public to view all jokes with corresponding tag
+# Allow public to view all jokes with corresponding tag, by upvote order
+# Inner join only keeps instances that exist across all 3 linked tables
 @jokes_bp.route('/tags/<string:name>/')
 def get_jokes_with_tag(name):
     stmt = db.select(Joke).join(Joke_tag).join(Tag).filter_by(name=name).outerjoin(Upvote).group_by(Joke.id).order_by(db.func.count(Joke.id).desc())
     jokes = db.session.scalars(stmt)
     return JokeSchema(many=True).dump(jokes)
 
-    
+
+# Allow public to view all comments
+@jokes_bp.route('/comments/')
+def read_all_comments():
+    stmt = db.select(Comment).order_by(Comment.date.desc())
+    comments = db.session.scalars(stmt)
+    return CommentSchema(many=True).dump(comments)
+
+# Allow users to delete their own comment, and admin to delete any comment
+@jokes_bp.route('/comments/', methods=['DELETE'])
+@jwt_required()
+def delete_comment():
+    user_id = int(get_jwt_identity())
+    # Fetch user
+    stmt = db.select(User).filter_by(id=user_id)
+    user = db.session.scalar(stmt)
+    # Find comment
+    stmt = db.select(Comment).filter_by(id=request.json['id'])
+    comment = db.session.scalar(stmt)
+
+    if comment:
+        if comment.user_id == user_id or user.is_admin:
+            db.session.delete(comment)
+            db.session.commit()
+            return {'message': f"Comment {request.json['id']} deleted"}
+        return {'error': 'You do not have permission to do this'}, 403      
+    return {'error': 'Comment not found'}, 404      
+
 
 
 # SELECT *

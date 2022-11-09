@@ -2,11 +2,13 @@ from flask import Blueprint, request, abort
 from init import db
 from models.joke import Joke, JokeSchema
 from models.upvote import Upvote, UpvoteSchema
+from models.comment import Comment, CommentSchema
 from models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow.exceptions import ValidationError
 from models.tag import Tag
 from models.joke_tag import Joke_tag, Joke_tagSchema
+from datetime import date
 
 # Nested blueprint from jokes_bp
 joke_ids_bp = Blueprint('joke_ids', __name__, url_prefix='/<int:id>')
@@ -67,7 +69,6 @@ def upvote_joke(id):
     joke = check_valid_joke(id)
     user_id = get_jwt_identity()
 
-    # this does not go through if error occurs at upvoteschema below
     new_upvote = Upvote(
         joke_id = id,
         user_id = user_id
@@ -92,7 +93,7 @@ def remove_upvote(id):
         db.session.delete(upvote)
         db.session.commit()
         return {'message':f'You have removed your upvote for joke {id}'}
-    return {'message': 'You have not upvoted this joke'}, 405
+    return {'message': 'There is no associated upvote for you to delete'}, 405
 
 
 # Allow owners or admin to add tag to a joke
@@ -130,8 +131,6 @@ def add_tag(id):
         db.session.add(new_joke_tag)
         db.session.commit()
         return Joke_tagSchema(exclude=['validation']).dump(new_joke_tag), 201
-
-
     raise ValidationError('You do not have permission to do this')
 
 
@@ -147,7 +146,6 @@ def delete_tag(id):
         subq = db.select(Tag).filter_by(name=request.json['tag']).subquery()
         stmt = db.select(Joke_tag).join(subq, Joke_tag.tag_id == subq.c.id).filter(Joke_tag.joke_id==id)
         tag = db.session.scalar(stmt)
-
         if tag:
             db.session.delete(tag)
             db.session.commit()
@@ -155,3 +153,31 @@ def delete_tag(id):
         raise ValidationError('This tag did not exist')
     raise ValidationError('You do not have permission to do this')
 
+# Allow public to view comments for specific joke
+@joke_ids_bp.route('/comments/')
+def see_comments_for_joke(id):
+    joke = check_valid_joke(id)
+    stmt = db.select(Comment).filter_by(joke_id=id)
+    comments = db.session.scalars(stmt)
+    return CommentSchema(many=True).dump(comments)
+
+# Allow users to add a comment
+@joke_ids_bp.route('/comments/', methods=['POST'])
+@jwt_required()
+def add_comment(id):
+    joke = check_valid_joke(id)
+    user_id = get_jwt_identity()
+    if len(request.json['body']) == 0:
+        raise ValidationError('Comments cannot be empty')
+    comment = Comment(
+        joke_id = id,
+        user_id = user_id,
+        body = request.json['body'],
+        date = date.today()
+    )
+    db.session.add(comment)
+    db.session.commit()
+    return CommentSchema().dump(comment), 201
+
+
+    

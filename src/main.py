@@ -43,9 +43,9 @@ def create_app():
     def validation_error(err):
         return {'error': err.messages}, 400
     
-    # @app.errorhandler(KeyError)
-    # def key_error(err):
-    #     return {'error': err}, 400
+    @app.errorhandler(KeyError)
+    def key_error(err):
+        return {'error': f'The field {err} is required'}, 400
 
 
     return app

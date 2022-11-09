@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from init import db
+from init import db, bcrypt
 from models.user import User, UserSchema
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -13,10 +13,11 @@ def get_all_users():
     users = db.session.scalars(stmt)
     # Read list of users only, thus jokes each users has contributed is excluded
     # List of jokes for each user can be seen at the individual user route
-    return UserSchema(many=True, exclude=['password', 'jokes', 'is_admin']).dump(users)
+    return UserSchema(many=True, exclude=['password', 'jokes']).dump(users)
 
 # Allow public to view individual users
 # View by id or by username
+# Note username cannot be only numbers so there will be no overlap
 @users_bp.route('/<string:username>/')
 @users_bp.route('/<int:id>/')
 def get_one_user(username=None, id=None):
@@ -44,43 +45,53 @@ def delete_one_user(id):
     user = db.session.scalar(stmt)
     if user:
         # Check user is owner, or if user is admin
+        # Need int to avoid pass by reference
         user_id = int(get_jwt_identity())
         stmt = db.select(User).filter_by(id=user_id)
         request_user = db.session.scalar(stmt)
         if id == user_id or request_user.is_admin:
             db.session.delete(user)
             db.session.commit()
-            return {'message': f'Joke {id} has been deleted'}
+            return {'message': f'User {id} has been deleted'}
         else:
-            return {'error': 'To delete a joke you must either own it or be an admin'}, 403
+            return {'error': 'To delete a user you must either be the user or be an admin'}, 403
     else:
         return {'error': f'No user found with id {id}'}, 404    
 
-# Allow users to change their OWN username and/or password
-# Returns resultant username, and whether password has been changed
+# Allow users to change their password
 @users_bp.route('/<int:id>/', methods=['PUT', 'PATCH'])
 @jwt_required()
-def edit_one_user(id): 
+def edit_password(id): 
     stmt = db.select(User).filter_by(id=id)
     user = db.session.scalar(stmt)
     if user:
         # Check user is owner; need int to avoid pass by reference
         user_id = int(get_jwt_identity())
-        # Keep track if password has been changed
-        password_change=False
-        if id == user_id:
-            # Check validity of input, and if yes assigns username if given
-            UserSchema().load(request.json)
-            user.username = request.json.get('username') or user.username
+        # Check old password is correct and the edit user matches the url user
+        if (id == user_id) and bcrypt.check_password_hash(user.password, request.json['old_password']):
+            # Ensure valid passwords
+            if len(request.json['new_password']) < 4:
+                return {'error': 'Passwords must be at lesat 4 characters long'}, 400
+            user.password = bcrypt.generate_password_hash(request.json['new_password']).decode('utf-8')
+            db.session.commit()
+            return {'message': 'You have changed your password'}
+        return {'error': 'You are not the user, or the password is incorrect'}, 403 
+    return {'error': f'No user found with id {id}'}, 404   
 
-            # Check if password has been changed
-            new_password = request.json.get('password')
-            if new_password and new_password != user.password:
-                user.password = new_password
-                password_change=True
-                db.session.commit()
-            return {'message': f'Username: {user.username}; You have changed your password: {password_change}'}
-        else:
-            return {'error': 'You are not the user'}, 403
-    else:
-        return {'error': f'No user found with id {id}'}, 404   
+    #     if id == user_id:
+    #         # Check validity of input
+    #         UserSchema().load(request.json)
+    #         user.username = request.json.get('username') or user.username
+
+    #         # Check if password has been changed
+    #         new_password = request.json.get('password')
+    #         if new_password and new_password != user.password:
+    #             user.password = new_password
+    #             password_change=True
+    #             db.session.commit()
+    #         UserSchema().dump(user)
+    #         return {'message': f'Username: {user.username}; You have changed your password: {password_change}'}
+    #     else:
+    #         return {'error': 'You are not the user'}, 403
+    # else:
+    #     return {'error': f'No user found with id {id}'}, 404   
