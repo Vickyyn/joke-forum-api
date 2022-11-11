@@ -12,7 +12,15 @@ The app allows an easy location to find jokes, listing them by popularity via th
 
 ## 2. Why is it a problem that needs solving?
 
-The problems listed in question 1 require solving for a few reasons. Firstly, everyone can do with more humour in their life. The ability to view jokes by popularity helps to save time in busy lives (instead of having to trawl through lists of unfunny jokes), hopefully adding a bit more joy to people's lives. Secondly, not everyone has the same sense of humour, and the ability to to find top humerous jokes by tags or categories help to overcome that. Thirdly, for those wishing to create jokes it can be difficult to gauge feedback as there may be a limited number of people available, or else the particular community (family or friendship group) may have a different sense of humour. By expanding the reach and audience of the creations, with the option for direct feedback via upvotes and comments, a creator can more efficiently craft their art. Finally, by providing access to a community of like-minded people, and encouraging creativity and interaction, it will help foster greater emotional and social wellbeing. 
+The problems listed in question 1 require solving for a few reasons. 
+
+Firstly, everyone can do with more humour in their life. The ability to view jokes by popularity helps to save time in busy lives (instead of having to trawl through lists of unfunny jokes), hopefully adding a bit more joy to people's lives. 
+
+Secondly, not everyone has the same sense of humour, and the ability to to find top humerous jokes by tags or categories help to overcome that. 
+
+Thirdly, for those wishing to create jokes it can be difficult to gauge feedback as there may be a limited number of people available, or else the particular community (family or friendship group) may have a different sense of humour. By expanding the reach and audience of the creations, with the option for direct feedback via upvotes and comments, a creator can more efficiently craft their art. 
+
+Finally, by providing access to a community of like-minded people, and encouraging creativity and interaction, it will help foster greater emotional and social wellbeing. 
 
 ## 3. Why have you chosen this database system. What are the drawbacks compared to others?
 PostgreSQL is chosen as the database system. The benefits include my familiarity, it being free and open source, and it being a relational database. Utilising a relational database is applicable to this app due to the interconnecting and rigid structure of components involved. As users interact with jokes and there are many relations between the two with upvotes and comments, a relational database allows easy grouping of data into well defined categories (e.g. users, jokes, comments, upvotes) with well defined attributes (e.g. all users have a username and a password), and easy and efficient relationship mappings to tie everything together (e.g. how a comment will be linked to a user and a joke, and similarly with upvotes). 
@@ -313,7 +321,7 @@ Required data: JSON object with key of tag `{'tag': 'oldtag'}`
 Expected response data: JSON, `{"message": f"you have deleted the tag {request.json.get('tag')} from joke {id}"}`
 Authentication method: Bearer token  
 Authorization: Owner of joke, or admin (via bearer token)  
-Description: Delete a tag  
+Description: Delete a joke tag  
 
 ### /jokes/\<int:id>/comments/
 Methods: GET  
@@ -342,20 +350,23 @@ Expected response data: JSON of comment
 ``` 
 Authentication method: Bearer token  
 Authorization: Users (via bearer token)  
-Description: Add a comment  
+Description: Add a comment to a specific joke  
 
 ## 6. An ERD for your app
 ![Entity relationship diagram](docs/ERD.png "ERD")
 
 ## 7. Detail any third party services (including PyPi packages) that your app will use
-- Flask: A Python micro web application framework. It builds upon Werkzeug (a Web Server Gateway Interface library) and Jinja (a templating engine) to help develop web applications easily by providing resusable code for common operations. As a microframework, it does not require libraries or tools. It does not contain form validation or a database abstraction layer, however there are numerous extensions that are supported for additional features. Advantages of using flask include scalability and flexibility.
-- Flask-sqlalchemy: A Flask extension that helps support SQLAlchemy in the app. It contains shortcuts and helpers for common tasks that need to be performed with SQLAlchemy
-- SQLAlchemy: 
+- Flask: A Python micro web application framework. It builds upon Werkzeug (a Web Server Gateway Interface library) and Jinja (a templating engine) to help develop web applications easily by providing resusable code for common operations. As a microframework, it does not require libraries or tools. It does not contain form validation or a database abstraction layer, however there are numerous extensions that are supported for additional features. Advantages of using flask include scalability and flexibility. Further components of flask include MarkupSafe (string handling library) and ItsDangerous (data serialization library). testtest
+- Flask-sqlalchemy: A Flask extension that adds support for SQLAlchemy in the app. It contains shortcuts and helpers for common tasks that need to be performed, simplifying usage (e.g. easier linking to a database, easier to modify or query data, or helping set up common objects such as models and tables, and more)
+- SQLAlchemy: Python SQL toolkit and Object Relational Mapper. See more about ORMs at question R4. In this app, allows high-performing and efficient database access via Python by providing the same power and flexibility as SQL
+- Flask-marshmallow: Integration layer for Flask and Marshmallow (see below), adding additional features to Marshmallow. It also integrates with Flask-sqlalchemy
+- Marshmallow: An object serialization/deserialization library. It converts complex datatypes (such as objects) to Python datatypes (serializing), and vice versa (deserializing). It can also validate input data. It works in synchrony with SQLAlchemy in this app (usually it is ORM/ODM/framework-agnostic) to read and display the data in a friendly format (e.g. serialized objects can be converted to JSON format to use in HTTP API)
+- Flask-bcrypt: Flask extension that allows bcrypt hashing
+- Bcrypt: Password hashing function, based on the Blowfish cipher. It hashes and salts passwords to assist with safe storage, and similarly allows for checking of passwords in hashed/salted format. Security is improved by having a random salt. Also, as it is not possible to unhash a password (hashing is one way), it adds another layer of security in case of data leaks. 
+- Flask-jwt-extended: Adds support for using JSON Web Tokens (JWT) to Flask, as well as additional features. It provides an authentication layer for the app by generating tokens, protecting routes to allow access to only those with valid tokens, with customisable expiry times for the tokens. Users can be identified by the token, and a secret key is used to provide an additional layer of security for tokens.
+- Python-dotenv: Set environment variables by reading key-value pairs from a `.env` file. Required for linking database and for providing the JWT secret key 
+- Other packages used are subpackages of the above (note during development psycopg2 was also used as a PostgreSQL database adaptor)
 
-
-
-- includes PyPi packages (not built ins)
-- complete and detailed description of third party services used in the app 
 
 ## 8. Describe your projects models in terms of the relationsips they have with each other
 - closely mirror ERD. describe in terms of SQLAlchemy/ORM/describe hwo they work
