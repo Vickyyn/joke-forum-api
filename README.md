@@ -347,8 +347,15 @@ Description: Add a comment
 ## 6. An ERD for your app
 ![Entity relationship diagram](docs/ERD.png "ERD")
 
-## 7. Detail any third party services that your app will use
-- can check this
+## 7. Detail any third party services (including PyPi packages) that your app will use
+- Flask: A Python micro web application framework. It builds upon Werkzeug (a Web Server Gateway Interface library) and Jinja (a templating engine) to help develop web applications easily by providing resusable code for common operations. As a microframework, it does not require libraries or tools. It does not contain form validation or a database abstraction layer, however there are numerous extensions that are supported for additional features. Advantages of using flask include scalability and flexibility.
+- Flask-sqlalchemy: A Flask extension that helps support SQLAlchemy in the app. It contains shortcuts and helpers for common tasks that need to be performed with SQLAlchemy
+- SQLAlchemy: 
+
+
+
+- includes PyPi packages (not built ins)
+- complete and detailed description of third party services used in the app 
 
 ## 8. Describe your projects models in terms of the relationsips they have with each other
 - closely mirror ERD. describe in terms of SQLAlchemy/ORM/describe hwo they work
@@ -356,6 +363,11 @@ Description: Add a comment
 - talk about same, but how a FK constraint would be represented in column of SQLAlchemy field
 - can do SQL screenshot and explanation 
 - e.g. backpopulating and foreign key method
+
+- R9: what database is planned to be, based on eRD
+- R8: what the app database ended up with in its code, whatever is in the finished app's models & schemas 
+- R9 should talk about b in db terms - tables, columns, relationships, primary/foreigh keys, etc
+- R8 should talk about SQLAlchemy models and Marshmallow schemas 
 
 ## 9. Discuss the database relations to be implemented in your application
 - discuss at DB level using DB terminology
