@@ -345,7 +345,7 @@ Authorization: Users (via bearer token)
 Description: Add a comment  
 
 ## 6. An ERD for your app
-
+![Entity relationship diagram](docs/ERD.png "ERD")
 
 ## 7. Detail any third party services that your app will use
 - can check this
