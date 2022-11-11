@@ -12,12 +12,12 @@ class Joke(db.Model):
     body = db.Column(db.Text, nullable=False)
     # Date of creation
     date = db.Column(db.Date) 
-    owner = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))
+    owner = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
 
     # Display the username as well as the owner(user_id)
     user = db.relationship('User', back_populates='jokes')
-    joke_tags = db.relationship('Joke_tag', back_populates='joke') # cascade='all, delete')
-    comments = db.relationship('Comment', back_populates='joke') #, cascade='all, delete')
+    joke_tags = db.relationship('Joke_tag', back_populates='joke', cascade='all, delete')
+    comments = db.relationship('Comment', back_populates='joke', cascade='all, delete')
 
 
 class JokeSchema(ma.Schema):
