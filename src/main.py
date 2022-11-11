@@ -29,7 +29,7 @@ def create_app():
     
     @app.route('/')
     def hello():
-        return 'Welcome to the jokes forum!'
+        return {'message': 'Welcome to the jokes forum!'}
 
     @app.errorhandler(400)
     def not_found(err):

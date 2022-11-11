@@ -23,14 +23,14 @@ def register_users():
         db.session.commit() 
     
         # Respond to client and ensure valid input
-        return UserSchema(exclude=['password', 'jokes', 'is_admin']).dump(user), 201
+        return UserSchema(exclude=['password', 'jokes', 'is_admin', 'comments']).dump(user), 201
     except IntegrityError:
         return {'error': 'Username already in use'}, 409
 
 # Allow users to log in
 @auth_bp.route('/login/', methods=['POST'])
 def login_users():
-    stmt = db.select(User).filter_by(username=request.json.get('username'))
+    stmt = db.select(User).filter_by(username=request.json['username'])
     user = db.session.scalar(stmt)
     if user and bcrypt.check_password_hash(user.password, request.json['password']):
         token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=3))
@@ -42,7 +42,7 @@ def login_users():
 @auth_bp.route('/admin/', methods=['POST'])
 @jwt_required()
 def create_admin():
-    stmt = db.select(User).filter_by(username=request.json.get('username'))
+    stmt = db.select(User).filter_by(username=request.json['username'])
     new_admin = db.session.scalar(stmt)
     user_id = get_jwt_identity()
     stmt = db.select(User).filter_by(id=user_id)

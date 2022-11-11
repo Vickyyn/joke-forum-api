@@ -179,5 +179,4 @@ def add_comment(id):
     db.session.commit()
     return CommentSchema().dump(comment), 201
 
-
-    
+# Note comment deletion is in the jokes controller

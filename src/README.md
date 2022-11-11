@@ -45,14 +45,304 @@ Benefits of ORM are:
 
 ## 5. Document all endpoints for your API
 
+### /
+Methods: GET  
+Argument: None  
+Required data: N/A  
+Expected response data: JSON, `{'message': 'Welcome to the jokes forum!'}`  
+Authentication method: Nil  
+Description: Welcome message, public
 
+## Users Documentation 
+### /users/
+Methods: GET  
+Argument: None  
+Required data: N/A  
+Expected response data: JSON array of users  
+Authentication method: Nil  
+Description: List of all users, public  
 
+### /users/<string:username>/
+Methods: GET  
+Argument: username (string)  
+Required data: N/A  
+Expected response data: JSON, corresponding user  
+```py
+{
+    "id": 1,
+    "username": "admin",
+    "jokes": [],
+    "is_admin": true,
+    "comments": [
+        {
+            "id": 1,
+            "joke_id": 1,
+            "user_id": 1,
+            "date": "2022-11-09",
+            "body": "What a great joke"
+        }
+    ]
+} 
+```
+Authentication method: Nil  
+Description: View a particular user, public  
 
-- there are tools to automate this, may need to write docstrings at top of methods, then a tool can generate it
-- include everything frontend would need to know about
-- e.g. if need authorization, format, body type ?JSON /XForm ?Binary
-- ? what is reponse format ?data types of passed parameters ? parameters to be passed 
-- e.g. Flask-autodoc (check documentation for what is expected)
+### /users/<int:id>/
+Methods: GET  
+Argument: id (integer)  
+Required data: N/A  
+Expected response data: JSON, corresponding user (same as above)  
+Authentication method: Nil  
+Description: View a particular user, public  
+
+### /users/<int:id>/
+Methods: DELETE  
+Argument: id (integer)  
+Required data: N/A  
+Expected response data: JSON, `{'message': f'User {id} has been deleted'}`   
+Authentication method: Bearer token  
+Authorisation: Joke owner or admin (via Bearer token)    
+Description: Delete a joke  
+
+### /users/<int:id>/
+Methods: PUT, PATCH  
+Argument: id (integer)  
+Required data: JSON object including keys of old_password and new_password, `{'old_password': 'oldpassword', 'new_password': 'newpassword'}`  
+Expected response data: JSON, `{'message': 'You have changed your password'}`  
+Authentication method: Bearer token  
+Authorisation: Corresponding user (via Bearer token)  
+Description: Change password for user  
+
+## Authentication documentation
+### /auth/register
+Methods: POST  
+Argument: Nil  
+Required data: JSON object including keys of username and password, `{'username': 'username', 'password': 'password'}`  
+Expected response data: JSON user object `{"id": 9, "username": "username"}`  
+Authentication method: Nil  
+Description: Register a user, public  
+
+### /auth/login
+Methods: POST  
+Argument: Nil  
+Required data: JSON object including keys of username and password, `{'username': 'username', 'password': 'password'}`  
+Expected response data: JSON object with keys of username and JWT token `{'username': 'username', 'token': 'JWTtokenhere'}`  
+Authentication method: Nil  
+Description: Login, public  
+
+### /auth/admin
+Methods: POST  
+Argument: Nil  
+Required data: JSON object including key of username `{'username': 'username'}`    
+Expected response data: JSON object of user   
+```py
+{
+    "id": 3,
+    "username": "Alice",
+    "is_admin": true,
+    "comments": [
+        {
+            "id": 4,
+            "joke_id": 4,
+            "user_id": 3,
+            "date": "2022-11-09",
+            "body": " "
+        }
+    ]
+}
+```  
+Authentication method: Bearer token  
+Authorization: Admin (via bearer token)  
+Description: Create admin   
+
+## Joke documentation
+### /jokes/
+Methods: GET  
+Argument: Nil  
+Required data: N/A  
+Expected response data: JSON array of jokes  
+Authentication method: Nil  
+Description: View all jokes, public  
+
+### /jokes/
+Methods: POST  
+Argument: Nil  
+Required data: JSON object with keys of title and body `{'title': 'titlehere', 'body': 'funnyjokehere'}`  
+Expected response data: JSON joke object   
+```py
+{
+    "id": 6,
+    "title": "funnytitlehere",
+    "body": "muchfunny",
+    "joke_tags": [],
+    "date": "2022-11-11",
+    "owner": 3,
+    "user": {
+        "username": "Alice"
+    },
+    "upvotes": 0,
+    "comments": []
+}
+```  
+Authentication method: Bearer token  
+Authorization: Users (via Bearer token)  
+Description: Create a joke  
+
+### /jokes/tags/
+Methods: GET  
+Argument: Nil  
+Required data: N/A  
+Expected response data: JSON array of tags  
+Authentication method: Nil  
+Description: View all tags, public  
+
+### /jokes/tags/<string:name>/
+Methods: GET  
+Argument: Nil  
+Required data: N/A  
+Expected response data: JSON array of jokes  
+Authentication method: Nil  
+Description: View all jokes with a corresponding tag, public  
+
+### /jokes/comments/
+Methods: GET  
+Argument: Nil  
+Required data: N/A  
+Expected response data: JSON array of comments  
+Authentication method: Nil  
+Description: View all comments, public  
+
+### /jokes/comments/
+Methods: DELETE  
+Argument: Nil  
+Required data: JSON object with key of id `{'id': '2'}`  
+Expected response data: JSON, `{'message': f"Comment {request.json['id']} deleted"}`  
+Authentication method: Bearer token  
+Authorization: User that created the comment, or admin (via Bearer token)  
+Description: Delete a comment  
+
+### /jokes/comments/
+Methods: PUT, PATCH  
+Argument: Nil  
+Required data: JSON object with keys of id and body `{'id': '3', 'body': 'newcommenthere'}`  
+Expected response data: JSON, 
+```py
+{
+    "id": 3,
+    "joke_id": 2,
+    "user_id": 4,
+    "date": "2022-11-09",
+    "body": "newcommenthere",
+    "user": {
+        "username": "Rhys"
+    }
+}
+```  
+Authentication method: Bearer token  
+Authorization: User that created the comment (via Bearer token)  
+Description: Edit a comment  
+
+## Specific jokes documentation
+### /jokes/<int:id>/
+Methods: GET  
+Argument: id (integer)  
+Required data: N/A  
+Expected response data: JSON object of particular joke  
+Authentication method: Nil  
+Description: View a joke, public  
+
+### /jokes/<int:id>/
+Methods: DELETE  
+Argument: id (integer)  
+Required data: N/A  
+Expected response data: JSON, `{'message': f'Joke {joke.id} has been deleted'} `
+Authentication method: Bearer token
+Authorization: Owner of joke, or admin (via bearer token)  
+Description: Delete a joke  
+
+### /jokes/<int:id>/
+Methods: PUT, PATCH  
+Argument: id (integer)  
+Required data: JSON object with keys of title and body `{'title': 'newtitle', 'body': 'newbody'}`  
+Expected response data: JSON object of joke  
+Authentication method: Bearer token  
+Authorization: Owner of joke (via bearer token)  
+Description: Edit a joke  
+
+### /jokes/<int:id>/upvote/
+Methods: POST  
+Argument: id (integer)  
+Required data: Nil  
+Expected response data: JSON object of upvote  `{"id": 6, "joke_id": 3, "user_id": 3}`
+Authentication method: Bearer token  
+Authorization: Users (via bearer token)  
+Description: Upvote a joke  
+
+### /jokes/<int:id>/upvote/
+Methods: DELETE  
+Argument: id (integer)  
+Required data: Nil  
+Expected response data: JSON, `{'message':f'You have removed your upvote for joke {id}'}`
+Authentication method: Bearer token  
+Authorization: User who have previously upvoted the joke (via bearer token)  
+Description: Delete an upvote  
+
+### /jokes/<int:id>/tags/
+Methods: POST  
+Argument: id (integer)  
+Required data: JSON object with key of tag `{'tag': 'newtag'}`  
+Expected response data: JSON of corresponding joke tag, 
+```py
+{
+    "id": 5,
+    "joke_id": 3,
+    "tag_id": 4,
+    "tag": {
+        "name": "newtag"
+    }
+}
+```
+Authentication method: Bearer token  
+Authorization: Owner of joke, or admin (via bearer token)  
+Description: Add a tag to a joke (creates a new tag if it does not previously exist)  
+
+### /jokes/<int:id>/tags/
+Methods: DELETE  
+Argument: id (integer)  
+Required data: JSON object with key of tag `{'tag': 'oldtag'}`
+Expected response data: JSON, `{"message": f"you have deleted the tag {request.json.get('tag')} from joke {id}"}`
+Authentication method: Bearer token  
+Authorization: Owner of joke, or admin (via bearer token)  
+Description: Delete a tag  
+
+### /jokes/<int:id>/comments/
+Methods: GET  
+Argument: id (integer)  
+Required data: N/A  
+Expected response data: JSON array of comments for particular joke  
+Authentication method: Nil  
+Description: View all comments for a joke, public  
+
+### /jokes/<int:id>/comments/
+Methods: POST  
+Argument: id (integer)  
+Required data: JSON object with key of body `{'body': 'new comment here'}`  
+Expected response data: JSON of comment
+ ```py
+ {
+    "id": 5,
+    "joke_id": 3,
+    "user_id": 3,
+    "date": "2022-11-11",
+    "body": "new comment here",
+    "user": {
+        "username": "Alice"
+    }
+}
+``` 
+Authentication method: Bearer token  
+Authorization: Users (via bearer token)  
+Description: Add a comment  
 
 ## 6. An ERD for your app
 
