@@ -62,7 +62,7 @@ Expected response data: JSON array of users
 Authentication method: Nil  
 Description: List of all users, public  
 
-### /users/\<string:username\>/
+### /users/\<string:username>/
 Methods: GET  
 Argument: username (string)  
 Required data: N/A  
@@ -95,7 +95,7 @@ Expected response data: JSON, corresponding user (same as above)
 Authentication method: Nil  
 Description: View a particular user, public  
 
-### /users/<int:id>/
+### /users/\<int:id>/
 Methods: DELETE  
 Argument: id (integer)  
 Required data: N/A  
@@ -104,7 +104,7 @@ Authentication method: Bearer token
 Authorisation: Joke owner or admin (via Bearer token)    
 Description: Delete a joke  
 
-### /users/<int:id>/
+### /users/\<int:id>/
 Methods: PUT, PATCH  
 Argument: id (integer)  
 Required data: JSON object including keys of old_password and new_password, `{'old_password': 'oldpassword', 'new_password': 'newpassword'}`  
@@ -196,7 +196,7 @@ Expected response data: JSON array of tags
 Authentication method: Nil  
 Description: View all tags, public  
 
-### /jokes/tags/<string:name>/
+### /jokes/tags/\<string:name>/
 Methods: GET  
 Argument: Nil  
 Required data: N/A  
@@ -243,7 +243,7 @@ Authorization: User that created the comment (via Bearer token)
 Description: Edit a comment  
 
 ## Specific jokes documentation
-### /jokes/<int:id>/
+### /jokes/\<int:id>/
 Methods: GET  
 Argument: id (integer)  
 Required data: N/A  
@@ -251,7 +251,7 @@ Expected response data: JSON object of particular joke
 Authentication method: Nil  
 Description: View a joke, public  
 
-### /jokes/<int:id>/
+### /jokes/\<int:id>/
 Methods: DELETE  
 Argument: id (integer)  
 Required data: N/A  
@@ -260,7 +260,7 @@ Authentication method: Bearer token
 Authorization: Owner of joke, or admin (via bearer token)  
 Description: Delete a joke  
 
-### /jokes/<int:id>/
+### /jokes/\<int:id>/
 Methods: PUT, PATCH  
 Argument: id (integer)  
 Required data: JSON object with keys of title and body `{'title': 'newtitle', 'body': 'newbody'}`  
@@ -269,7 +269,7 @@ Authentication method: Bearer token
 Authorization: Owner of joke (via bearer token)  
 Description: Edit a joke  
 
-### /jokes/<int:id>/upvote/
+### /jokes/\<int:id>/upvote/
 Methods: POST  
 Argument: id (integer)  
 Required data: Nil  
@@ -278,7 +278,7 @@ Authentication method: Bearer token
 Authorization: Users (via bearer token)  
 Description: Upvote a joke  
 
-### /jokes/<int:id>/upvote/
+### /jokes/\<int:id>/upvote/
 Methods: DELETE  
 Argument: id (integer)  
 Required data: Nil  
@@ -287,7 +287,7 @@ Authentication method: Bearer token
 Authorization: User who have previously upvoted the joke (via bearer token)  
 Description: Delete an upvote  
 
-### /jokes/<int:id>/tags/
+### /jokes/\<int:id>/tags/
 Methods: POST  
 Argument: id (integer)  
 Required data: JSON object with key of tag `{'tag': 'newtag'}`  
@@ -306,7 +306,7 @@ Authentication method: Bearer token
 Authorization: Owner of joke, or admin (via bearer token)  
 Description: Add a tag to a joke (creates a new tag if it does not previously exist)  
 
-### /jokes/<int:id>/tags/
+### /jokes/\<int:id>/tags/
 Methods: DELETE  
 Argument: id (integer)  
 Required data: JSON object with key of tag `{'tag': 'oldtag'}`
@@ -315,7 +315,7 @@ Authentication method: Bearer token
 Authorization: Owner of joke, or admin (via bearer token)  
 Description: Delete a tag  
 
-### /jokes/<int:id>/comments/
+### /jokes/\<int:id>/comments/
 Methods: GET  
 Argument: id (integer)  
 Required data: N/A  
@@ -323,7 +323,7 @@ Expected response data: JSON array of comments for particular joke
 Authentication method: Nil  
 Description: View all comments for a joke, public  
 
-### /jokes/<int:id>/comments/
+### /jokes/\<int:id>/comments/
 Methods: POST  
 Argument: id (integer)  
 Required data: JSON object with key of body `{'body': 'new comment here'}`  
