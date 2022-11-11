@@ -87,7 +87,7 @@ Expected response data: JSON, corresponding user
 Authentication method: Nil  
 Description: View a particular user, public  
 
-### /users/<int:id>/
+### /users/\<int:id>/
 Methods: GET  
 Argument: id (integer)  
 Required data: N/A  
