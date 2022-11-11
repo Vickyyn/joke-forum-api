@@ -2,11 +2,11 @@
 
 ## 1. Identification of the problem you are trying to solve by building this particular app
 
-Problem 1: There are so many jokes that it can be difficult to find and separate the good from the bad. 
-Problem 2: It can also be difficult to find good jokes of a particular category.
-Problem 3: It is hard to find a creative outlet to contribute jokes.
-Problem 4: It can be hard to get feedback for jokes you have created. 
-Problem 5: It can be difficult to find a community that likes jokes as much as you do. 
+Problem 1: There are so many jokes that it can be difficult to find and separate the good from the bad.  
+Problem 2: It can also be difficult to find good jokes of a particular category.  
+Problem 3: It is hard to find a creative outlet to contribute jokes.  
+Problem 4: It can be hard to get feedback for jokes you have created.  
+Problem 5: It can be difficult to find a community that likes jokes as much as you do.  
 
 The app allows an easy location to find jokes, listing them by popularity via the upvote system. Tags are utilised to allow an easy way to find the most humerous jokes by category. Comments are also allowed on jokes to allow for user interactions, whether it be to express reactions or give feedback, to further explain the joke, or to even add follow-up jokes.
 
@@ -62,7 +62,7 @@ Expected response data: JSON array of users
 Authentication method: Nil  
 Description: List of all users, public  
 
-### /users/<string:username>/
+### /users/\<string:username\>/
 Methods: GET  
 Argument: username (string)  
 Required data: N/A  
