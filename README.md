@@ -406,7 +406,20 @@ User stories were then created to identify key functionality aims, to assist wit
 
 In addition to this I further subdivided user stories into smaller functional chunks, to allow building of one upon another. For example, I broke up 'as a user I want to post jokes' into 'link a database to flask', 'make User model', 'make Joke model', 'create/seed/drop tables from Flask', 'create route to post jokes', 'authentication', and more. I similarly did this for all user stories.
 
-These tasks formed the 'backlog' of the board, and additionally tagged and colour coded by whether they had to be done first (e.g. linking database, create/seed/drop tables, models), their importance, length of time expected, and due date if applicable. Each task was then moved along the board as it got to 'doing', 'testing', and 'done'. Having the Trello board allowed me to see at a glance how on track I was for the project, and what the important tasks were that I was yet to do. By having the due date for particular tasks I could set a timeline for myself and stick to it. 
+These tasks formed the 'backlog' of the board, and additionally tagged and colour coded by whether they had to be done first (e.g. linking database, create/seed/drop tables, models), their importance, length of time expected, and due date if applicable. Each task was then moved along the board as it got to 'to do' (imminently going to be doing), 'doing', 'testing', and 'done'. 
+
+Having the Trello board allowed me to see at a glance how on track I was for the project, and what the important tasks were that I was yet to do. Additional tasks that were required along the way was uploaded to the board. By having the due date for particular tasks I could set a timeline for myself and stick to it. 
 
 
 ## Installation instructions
+1. Open Terminal
+2. Clone (or download) the files for the application by running the following:  
+   `git clone git@github.com:Vickyyn/joke-forum-api.git`
+3. Navigate into the source folder:
+4. `cd joke-forum-api/src`
+5. Open and edit the `.env.sample` file to input your variables (examples have been given). You will need to set up a database to link to the app. When done, change the name of the file to `.env` 
+6. Set up a virtual environment and download the required packages by running:
+   `python3 -m venv .venv`
+   `source .venv/bin/activate`
+   `pip install -r requirements.txt`
+7. Enter `flask run` to run the app!
