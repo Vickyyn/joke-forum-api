@@ -17,6 +17,8 @@ class Joke_tagSchema(ma.Schema):
     # Ensure all instances are unique (the tag does not already exist for the joke)
     validation = fields.Method("is_unique_instance")
     def is_unique_instance(self, obj):
+        # Count all joke_tag instances where joke_id = joke_id of the object, and tag_id = tag_id of the object passed in
+        # Should be 1 if it already exists, 0 if not
         stmt = db.select(db.func.count()).select_from(Joke_tag).filter_by(joke_id=obj.joke_id, tag_id=obj.tag_id)
         exist = db.session.scalar(stmt)
         if exist:

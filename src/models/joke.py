@@ -26,16 +26,10 @@ class JokeSchema(ma.Schema):
     title = fields.String(required=True, validate=Length(max=150, error='titles can only be up to 150 characters'))
     joke_tags = fields.List(fields.Nested(('Joke_tagSchema'), only=['tag']))
     # Include upvotes in display of jokes, calculated from database
+    # Count all Upvote where joke_id = joke_id of the object
     upvotes = fields.Function(lambda obj: db.session.query(Upvote).filter_by(joke_id=obj.id).count())
     comments = fields.List(fields.Nested('CommentSchema', exclude=['joke_id']))
 
     class Meta:
         fields = ('id', 'title', 'body', 'joke_tags', 'date', 'owner', 'user', 'upvotes', 'comments')
         ordered = True
-
-
-# list owner name rather than owner id
-# SELECT joke_id, count(joke_id)                                                                      
-# FROM jokes LEFT JOIN upvotes
-# ON jokes.id = upvotes.joke_id
-# GROUP BY joke_id;

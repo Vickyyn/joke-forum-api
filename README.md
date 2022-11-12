@@ -422,4 +422,6 @@ Having the Trello board allowed me to see at a glance how on track I was for the
    `python3 -m venv .venv`  
    `source .venv/bin/activate`  
    `pip install -r requirements.txt`  
-7. Enter `flask run` to run the app!
+7. Run `flask db drop && flask db create` to create the tables in the database
+8. Optional: Run `flask db seed` to seed the tables with sample data
+9. Enter `flask run` to run the app!
