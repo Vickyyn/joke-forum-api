@@ -1,5 +1,11 @@
 # Jokes Forum API
 
+## [Github repo](https://github.com/Vickyyn/joke-forum-api)
+## [Responses](#Responses)
+
+
+
+# Responses
 ## 1. Identification of the problem you are trying to solve by building this particular app
 
 Problem 1: There are so many jokes that it can be difficult to find and separate the good from the bad.  
@@ -35,7 +41,7 @@ Object Relational Mapping (ORM) serves as a _bridge_ between _objects_ in an app
 
 Key functionalities of an ORM include (using Flask and PostgreSQL as an example):
 - Connect web application frameworks (e.g. Flask) with the database (e.g. PostgreSQL). This allows direct data manipulation via using programming languages such as Python, Ruby and more. 
-- Mapping models (or objects) in Flask to tables in the database. By creating a class object in Flask, this maps to a table in the database. Attributes within the object model become attributes in the database table, with appropriate constraints including primary keys, data types, and more.
+- Mapping models (or objects) in Flask to tables in the database. By creating a class object in Flask, this maps to a table in the database. Fields within the object model become attributes in the database table, with appropriate constraints including primary keys, data types, and more.
 - Assists with commands to create, drop, and seed tables from objects. This allows the initial set up of the database, for the objects to map to tables in the database, and to allow instances of objects to map to instances/data in the tables. 
 - Directly maps creating, reading, updating, and deleting (CRUD) functionalities between Flask and the database. For example takes an input instance and then creates the instance in the database (e.g. SQLAlchemy via session.add(instance) and session.commit()). With the help of a deserialization library (Marshmallow), it also retrieves or reads instances from the database, which is then converted to a readable form by Marshmallow, and the objects outputted (e.g. select or query to select instances from the appropriate table, with option to use filter and order by to fine-tune selections). This can all be done using Python rather than SQL. Further examples include session.delete(instance), mapping updates to instances from Python form to the database, and more. 
 - Essentially, ORM allows SQL queries and database interactions to be performed using object-oriented programming of a preferred programming language
@@ -356,7 +362,7 @@ Description: Add a comment to a specific joke
 ![Entity relationship diagram](docs/ERD.png "ERD")
 
 ## 7. Detail any third party services (including PyPi packages) that your app will use
-- Flask: A Python micro web application framework. It builds upon Werkzeug (a Web Server Gateway Interface library) and Jinja (a templating engine) to help develop web applications easily by providing resusable code for common operations. As a microframework, it does not require libraries or tools. It does not contain form validation or a database abstraction layer, however there are numerous extensions that are supported for additional features. Advantages of using flask include scalability and flexibility. Further components of flask include MarkupSafe (string handling library) and ItsDangerous (data serialization library). testtest
+- Flask: A Python micro web application framework. It builds upon Werkzeug (a Web Server Gateway Interface library) and Jinja (a templating engine) to help develop web applications easily by providing resusable code for common operations. As a microframework, it does not require libraries or tools. It does not contain form validation or a database abstraction layer, however there are numerous extensions that are supported for additional features. Advantages of using flask include scalability and flexibility. Further components of flask include MarkupSafe (string handling library) and ItsDangerous (data serialization library)
 - Flask-sqlalchemy: A Flask extension that adds support for SQLAlchemy in the app. It contains shortcuts and helpers for common tasks that need to be performed, simplifying usage (e.g. easier linking to a database, easier to modify or query data, or helping set up common objects such as models and tables, and more)
 - SQLAlchemy: Python SQL toolkit and Object Relational Mapper. See more about ORMs at question R4. In this app, allows high-performing and efficient database access via Python by providing the same power and flexibility as SQL
 - Flask-marshmallow: Integration layer for Flask and Marshmallow (see below), adding additional features to Marshmallow. It also integrates with Flask-sqlalchemy
@@ -369,6 +375,17 @@ Description: Add a comment to a specific joke
 
 
 ## 8. Describe your projects models in terms of the relationsips they have with each other
+- User and Jokes: In the Joke model the field 'owner' is a foreign key referencing the primary key field 'id' of model User. This is dictated by the usage of `db.ForeignKey(('users.id', ondelete='CASCADE)`. The second specifcation denotes that when the corresponding primary key value is deleted from the User side, then the whole Joke instance will also be deleted. By further adding `nullable=False`, it adds another layer of data integrity by preventing deletion anomalies where a user may be deleted without deleting the corresponding joke/s.
+- User and Joke also have an additional relationship via the 'user' field in the Joke model, and a corresponding 'jokes' field in the User model. This relationship performs two functions. Firstly, on the Joke side, `db.relationship('User', back_populates='jokes')` links the particular user corresponding to the joke. Then in the Joke schema `fields.Nested` can be called upon to retrieve all fields of the corresponding user, though in this app only the field `username` is displayed for convenience. On the User side, having `db.relationship('Joke', back_populates='user', cascade='all, delete')` allows the field `jokes` to contain all jokes that relate to the user, and when the schema displays a User it includes all corresponding jokes and their fields (except for the fields that are excluded, such as `user` and `owner` to prevent retrieval loops). The delete on cascade protects against deletion anomalies.
+- Comment model has a similar relationship to both the User and the Joke model. Comments relates to the User model in two fields - firstly the user_id field, which is a foreign key linking to the primary key of the User model `db.ForeignKey(users.id, ondelete='CASCADE')`. Secondly there is the additional relationship `db.relationship('User', back_populates='comments')`, which allows for nested fields showing all relevant fields of the relevant User whenever a Comment is displayed using the schema. In this app, only the `username` field is shown from User, so there can be easy identification of the owner of the comment. Correspondingly on the User mode. `db.relationship('Comment', back_populates='user', cascade='all, delete')` allows for a display of a list of nested fields of relevant comments that apply for a particular user. Once again the `user` field is excluded to prevent retrieval loops. Cascade delete once again prevents deletion anomalies by deleting the relevant comments if a user is deleted. Comments has the same relationship with Joke as with User. Thus all jokes will display corresponding comments, and comments can also display the jokes, though in this app I have not allowed comments to display jokes due to the layout.
+- The Joke_tag model serves as a join table linking the Joke model and the Tag model. It links to Tag by having the field tag_id corresponding to the Tag model primary key `db.ForeignKey('tags.id', ondelete=CASCADE')`, with an additional relationship via the `tag` field utilising `db.relationship('Tag', back_populates='joke_tags')`. This allows display of nested fields of corresponding tags in the schema, though in this app only the `name` field is included for convenience. Joke_tag has the same relationship with the Joke model, however in the Joke model schema the joke tags are displayed to show the name of all corresponding tags for a joke. 
+- Of interest, the joke tag schema includes a validation to ensure instances are unique. As jokes should not have the same tag twice, this is an additional constraint applied to the schema to ensure there are no repeats
+- 
+
+
+
+
+
 - closely mirror ERD. describe in terms of SQLAlchemy/ORM/describe hwo they work
 - ? what reference is created b/w a Card and a User? vs what r/ship exists in the DB
 - talk about same, but how a FK constraint would be represented in column of SQLAlchemy field
