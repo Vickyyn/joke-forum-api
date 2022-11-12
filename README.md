@@ -1,8 +1,8 @@
 # Jokes Forum API
 
 ## [Github repo](https://github.com/Vickyyn/joke-forum-api)
-## [Responses](#Responses)
-## [Installation instructions](#Installation-instructions)
+## [Responses](#responses)
+## [Installation instructions](#installation)
 
 
 
@@ -411,7 +411,7 @@ These tasks formed the 'backlog' of the board, and additionally tagged and colou
 Having the Trello board allowed me to see at a glance how on track I was for the project, and what the important tasks were that I was yet to do. Additional tasks that were required along the way was uploaded to the board. By having the due date for particular tasks I could set a timeline for myself and stick to it. 
 
 
-# Installation instructions
+# Installation
 1. Open Terminal
 2. Clone (or download) the files for the application by running the following:  
    `git clone git@github.com:Vickyyn/joke-forum-api.git`
