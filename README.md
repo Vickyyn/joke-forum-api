@@ -2,6 +2,7 @@
 
 ## [Github repo](https://github.com/Vickyyn/joke-forum-api)
 ## [Responses](#Responses)
+## [Installation instructions](#installation-instructions)
 
 
 
@@ -374,34 +375,38 @@ Description: Add a comment to a specific joke
 - Other packages used are subpackages of the above (note during development psycopg2 was also used as a PostgreSQL database adaptor)
 
 
-## 8. Describe your projects models in terms of the relationsips they have with each other
-- User and Jokes: In the Joke model the field 'owner' is a foreign key referencing the primary key field 'id' of model User. This is dictated by the usage of `db.ForeignKey(('users.id', ondelete='CASCADE)`. The second specifcation denotes that when the corresponding primary key value is deleted from the User side, then the whole Joke instance will also be deleted. By further adding `nullable=False`, it adds another layer of data integrity by preventing deletion anomalies where a user may be deleted without deleting the corresponding joke/s.
-- User and Joke also have an additional relationship via the 'user' field in the Joke model, and a corresponding 'jokes' field in the User model. This relationship performs two functions. Firstly, on the Joke side, `db.relationship('User', back_populates='jokes')` links the particular user corresponding to the joke. Then in the Joke schema `fields.Nested` can be called upon to retrieve all fields of the corresponding user, though in this app only the field `username` is displayed for convenience. On the User side, having `db.relationship('Joke', back_populates='user', cascade='all, delete')` allows the field `jokes` to contain all jokes that relate to the user, and when the schema displays a User it includes all corresponding jokes and their fields (except for the fields that are excluded, such as `user` and `owner` to prevent retrieval loops). The delete on cascade protects against deletion anomalies.
-- Comment model has a similar relationship to both the User and the Joke model. Comments relates to the User model in two fields - firstly the user_id field, which is a foreign key linking to the primary key of the User model `db.ForeignKey(users.id, ondelete='CASCADE')`. Secondly there is the additional relationship `db.relationship('User', back_populates='comments')`, which allows for nested fields showing all relevant fields of the relevant User whenever a Comment is displayed using the schema. In this app, only the `username` field is shown from User, so there can be easy identification of the owner of the comment. Correspondingly on the User mode. `db.relationship('Comment', back_populates='user', cascade='all, delete')` allows for a display of a list of nested fields of relevant comments that apply for a particular user. Once again the `user` field is excluded to prevent retrieval loops. Cascade delete once again prevents deletion anomalies by deleting the relevant comments if a user is deleted. Comments has the same relationship with Joke as with User. Thus all jokes will display corresponding comments, and comments can also display the jokes, though in this app I have not allowed comments to display jokes due to the layout.
-- The Joke_tag model serves as a join table linking the Joke model and the Tag model. It links to Tag by having the field tag_id corresponding to the Tag model primary key `db.ForeignKey('tags.id', ondelete=CASCADE')`, with an additional relationship via the `tag` field utilising `db.relationship('Tag', back_populates='joke_tags')`. This allows display of nested fields of corresponding tags in the schema, though in this app only the `name` field is included for convenience. Joke_tag has the same relationship with the Joke model, however in the Joke model schema the joke tags are displayed to show the name of all corresponding tags for a joke. 
-- Of interest, the joke tag schema includes a validation to ensure instances are unique. As jokes should not have the same tag twice, this is an additional constraint applied to the schema to ensure there are no repeats
-- 
-
-
-
-
-
-- closely mirror ERD. describe in terms of SQLAlchemy/ORM/describe hwo they work
-- ? what reference is created b/w a Card and a User? vs what r/ship exists in the DB
-- talk about same, but how a FK constraint would be represented in column of SQLAlchemy field
-- can do SQL screenshot and explanation 
-- e.g. backpopulating and foreign key method
-
-- R9: what database is planned to be, based on eRD
-- R8: what the app database ended up with in its code, whatever is in the finished app's models & schemas 
-- R9 should talk about b in db terms - tables, columns, relationships, primary/foreigh keys, etc
-- R8 should talk about SQLAlchemy models and Marshmallow schemas 
+## 8. Describe your projects models in terms of the relationships they have with each other
+- User and Joke: Users create jokes, and each joke has a corresponding owner. Deleting a user will delete all the jokes they have created. In the Joke model the field 'owner' is a foreign key referencing the primary key field 'id' of model User. This is dictated by the usage of `db.ForeignKey(('users.id', ondelete='CASCADE)`. The second specifcation denotes that when the corresponding primary key value is deleted from the User side, then the whole Joke instance will also be deleted (thus if a user is deleted, the jokes they have created will be deleted too). By further adding `nullable=False`, it adds another layer of data integrity by preventing deletion anomalies where a user may be deleted without deleting the corresponding joke/s (thus jokes cannot exist without having a owner).
+- Viewing a user will display all the jokes they have created. Viewing a joke will display the username of the creator, rather than just the user id. User and Joke also have an additional relationship via the 'user' field in the Joke model, and a corresponding 'jokes' field in the User model. This relationship is done by firstly, on the Joke side, `user = db.relationship('User', back_populates='jokes')` links the particular user corresponding to the joke. Then in the Joke schema `fields.Nested` can be called upon to retrieve all fields of the corresponding user, though in this app only the field `username` is displayed for convenience. Secondly, on the User side, having `jokes = db.relationship('Joke', back_populates='user', cascade='all, delete')` allows the field `jokes` to contain all jokes that relate to the user, and when the schema displays a User it includes all corresponding jokes and their fields (except for the fields that are excluded, such as `user` and `owner` to prevent retrieval loops). The delete on cascade protects against deletion anomalies.
+- Users can post Comments on Jokes. The comments are deleted if either the joke is deleted, or if the user is deleted. Viewing a user will also view the comments they have posted, and viewing a joke will also show all the comments for the joke. The Comment model has a similar relationship to both the User and the Joke model. Comments relates to the User model in two fields - firstly the user_id field, which is a foreign key linking to the primary key of the User model `db.ForeignKey(users.id, ondelete='CASCADE')`. Secondly there is the additional relationship `db.relationship('User', back_populates='comments')`, which allows for nested fields showing all relevant fields of the relevant User whenever a Comment is displayed using the schema. In this app, only the `username` field is shown from User, so there can be easy identification of the owner of the comment. Correspondingly on the User mode. `comments = db.relationship('Comment', back_populates='user', cascade='all, delete')` allows for a display of a list of nested fields of relevant comments that apply for a particular user. Once again the `user` field is excluded to prevent retrieval loops. Cascade delete once again prevents deletion anomalies by deleting the relevant comments if a user is deleted. Comments has the same relationship with Joke as with User. Thus all jokes will display corresponding comments, and comments can also display the jokes, though in this app I have not allowed comments to display jokes due to the layout.
+- Jokes can have multiple tags. Viewing jokes will show the names of the tags attached. Deleting a joke will delete all corresponding joke tags. The Joke_tag model serves as a join table linking the Joke model and the Tag model. It links to Tag by having the field tag_id corresponding to the Tag model primary key `db.ForeignKey('tags.id', ondelete=CASCADE')`, with an additional relationship via the `tag` field utilising `db.relationship('Tag', back_populates='joke_tags')`. This allows display of nested fields of corresponding tags in the schema, though in this app only the `name` field is included for convenience. Joke_tag has the same relationship with the Joke model, however in the Joke model schema the joke tags are displayed to show the name of all corresponding tags for a joke. 
+- A joke should not have the same tag twice. The joke tag schema includes a validation to ensure instances are unique. This is an additional constraint applied to the schema to ensure there are no repeats
+- Users can upvote jokes they like. the Upvote model only contains foreign key relations to the primary key of the User model, and the primary key of the Joke model. No additional relationships are defined as upvote instances do not need to be displayed by the user or the joke model directly. 
+- As the same user should not be able to upvote the same joke more than once, the Upvote schema also contains an additional validation to ensure instances are not repeated
 
 ## 9. Discuss the database relations to be implemented in your application
-- discuss at DB level using DB terminology
-- eg how FK would look like in DB on DB1v1
-- can refer to ERD
 
-## 10. Describe the way tasks are allocated and tracked in  your project 
-- Trello/Kanban
-- Agile short stories recommended 
+Please see ERD from R6 for reference. 
+
+Jokes table contains a foreign key column of owner, which corresponds to the primary key of the User table. From the User id to the Joke owner it is an optional one to many relationship, as a user may create no jokes, or many jokes. Conversely, a Joke owner must correspond to one and only one User id, as Joke owner also has the definition of NOT NULL. 
+
+Comments table contains two foreign key columns: joke_id, which corresponds to Joke id (primary key), and user_id, which corresponds to User id (primary key). From both User and Joke id it is an optional one to many relationship to Comments user_id/joke_id, as a user can write zero or many comments, and a joke can have zero or many comments. Conversely, joke_id and user_id must correspond to one and only one Joke id and User id, as these two fields are designated to be NOT NULL, as there cannot be a comment without a corresponding user and joke.
+
+Joke_tags table serves as a join table between Jokes and Tags, as there is a many to many relationship between them as a joke can have multiple tags, and a single tag can belong to multiple jokes. As such, Joke_tags contains two foreign key columns: joke_id (corresponding to Jokes id PK) and tag_id (corresponding to Tags id PK). From the primary key of Jokes and Tags tables to their corresponding foreign keys it is an optional one to many relationship, as a tag may exist without belonging to a joke, and a joke may exist with no tags. Conversely, a Joke_tag instance must correspond to one and only one joke, and one and only one tag. This is further constrained via the NOT NULL constraints. 
+
+Upvotes table also contains two foreign key columns, joke_id (linking to Jokes id PK) and user_id (linking to User id PK). From the Jokes and Users tables it is an optional one to many relationship, as a joke may have no or multiple upvotes, and a user can apply no or many upvotes. Conversely, an upvote instance must correspond to one and only one joke, and one and only one user. This is further constrained by the NOT NULL constraint. 
+
+
+## 10. Describe the way tasks are allocated and tracked in your project 
+Tasks are allocated and tracked utilising user stories and a Trello board. 
+
+Firstly, a Trello board with a Kanban template was created with columns of 'backlog', 'to do', 'doing', 'testing', and 'done'. 
+
+User stories were then created to identify key functionality aims, to assist with understanding what the minimum viable product was, and to break the project down into smaller functional chunks. Examples of user stories include 'as a user I want to post jokes', 'as a user I want to upvote jokes', 'as a user I want to comment on jokes', 'as an admin I want to delete inappropriate jokes', 'as a user I want to see jokes by corresponding tags', and more. 
+
+In addition to this I further subdivided user stories into smaller functional chunks, to allow building of one upon another. For example, I broke up 'as a user I want to post jokes' into 'link a database to flask', 'make User model', 'make Joke model', 'create/seed/drop tables from Flask', 'create route to post jokes', 'authentication', and more. I similarly did this for all user stories.
+
+These tasks formed the 'backlog' of the board, and additionally tagged and colour coded by whether they had to be done first (e.g. linking database, create/seed/drop tables, models), their importance, length of time expected, and due date if applicable. Each task was then moved along the board as it got to 'doing', 'testing', and 'done'. Having the Trello board allowed me to see at a glance how on track I was for the project, and what the important tasks were that I was yet to do. By having the due date for particular tasks I could set a timeline for myself and stick to it. 
+
+
+## Installation instructions
