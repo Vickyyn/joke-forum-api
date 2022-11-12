@@ -299,7 +299,7 @@ Argument: id (integer)
 Required data: Nil  
 Expected response data: JSON, `{'message':f'You have removed your upvote for joke {id}'}`
 Authentication method: Bearer token  
-Authorization: User who have previously upvoted the joke (via bearer token)  
+Authorization: Users who have previously upvoted the joke (via bearer token)  
 Description: Delete an upvote  
 
 ### /jokes/\<int:id>/tags/
