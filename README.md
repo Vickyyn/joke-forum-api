@@ -2,7 +2,7 @@
 
 ## [Github repo](https://github.com/Vickyyn/joke-forum-api)
 ## [Responses](#Responses)
-## [Installation instructions](#installation-instructions)
+## [Installation instructions](#Installation-instructions)
 
 
 
@@ -411,15 +411,15 @@ These tasks formed the 'backlog' of the board, and additionally tagged and colou
 Having the Trello board allowed me to see at a glance how on track I was for the project, and what the important tasks were that I was yet to do. Additional tasks that were required along the way was uploaded to the board. By having the due date for particular tasks I could set a timeline for myself and stick to it. 
 
 
-## Installation instructions
+# Installation instructions
 1. Open Terminal
 2. Clone (or download) the files for the application by running the following:  
    `git clone git@github.com:Vickyyn/joke-forum-api.git`
 3. Navigate into the source folder:
 4. `cd joke-forum-api/src`
 5. Open and edit the `.env.sample` file to input your variables (examples have been given). You will need to set up a database to link to the app. When done, change the name of the file to `.env` 
-6. Set up a virtual environment and download the required packages by running:
-   `python3 -m venv .venv`
-   `source .venv/bin/activate`
-   `pip install -r requirements.txt`
+6. Set up a virtual environment and download the required packages by running:  
+   `python3 -m venv .venv`  
+   `source .venv/bin/activate`  
+   `pip install -r requirements.txt`  
 7. Enter `flask run` to run the app!
